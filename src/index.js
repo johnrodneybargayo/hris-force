@@ -1,6 +1,12 @@
 const express = require('express');
 const serverless = require('serverless-http');
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const authRoutes = require('./routes/authRoutes');
+const authMiddleware = require('./middlewares/authMiddleware');
+const jwt = require('jsonwebtoken');
+const User = require('./models/User');
 
 const app = express();
 const router = express.Router();
@@ -14,7 +20,7 @@ const mongoOptions = {
 };
 
 // Connect to MongoDB
-mongoose.connect(mongoURI, mongoOptions)
+mongoose.connect(mongoURI, { ...mongoOptions, dbName })
   .then(() => {
     console.log('Connected to MongoDB');
   })
@@ -22,31 +28,53 @@ mongoose.connect(mongoURI, mongoOptions)
     console.error('Error connecting to MongoDB:', error);
   });
 
-// Define the route that interacts with the MongoDB database
-router.get("/", async (req, res) => {
-  try {
-    const ExampleModel = mongoose.model('Example', new mongoose.Schema({
-      name: String,
-      age: Number
-    }));
+// Middleware
+app.use(bodyParser.json());
+app.use(cors()); // Enable CORS
+app.use('/.netlify/functions/index', router); // Map the router to the specific path
 
-    const result = await ExampleModel.find();
-    res.json(result);
+// Routes
+router.use('/auth', authRoutes);
+
+// Sign-in controller
+router.post('/auth/sign-in', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Check if user exists
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Compare password
+    if (await user.comparePassword(password)) {
+      // Generate JWT token
+      const secretKey = 'your-secret-key';
+      const token = jwt.sign({ userId: user._id }, secretKey, { expiresIn: '1h' });
+
+      // Sign-in successful
+      return res.status(200).json({ message: 'Sign-in successful', token });
+    }
+
+    return res.status(401).json({ error: 'Invalid credentials' });
   } catch (error) {
-    console.error('Error querying MongoDB:', error);
+    console.error('Error during sign-in:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-
-app.use("/.netlify/functions/index", router);
+// Default route
+router.get("/", (req, res) => {
+  res.send('Welcome to the HR System API');
+});
 
 // Export the app wrapped with serverless-http
 module.exports.handler = serverless(app);
 
-
 // Start the server
-const PORT = process.env.PORT || 3000; // Use the provided port or 3000 as default
+const PORT = process.env.PORT || 3000; // Use the provided port or 4000 as default
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
