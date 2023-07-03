@@ -10,30 +10,28 @@ const generateToken = (userId) => {
 
 // Sign-in controller
 exports.login = async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    // Check if user exists
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+    const { email, password } = req.query; // Retrieve email and password from query parameters
+  
+    try {
+      // Check if user exists
+      const user = await User.findOne({ email });
+  
+      if (!user) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+  
+      // Check password
+      const isPasswordValid = await user.comparePassword(password);
+  
+      if (!isPasswordValid) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+  
+      // User found and password is valid
+      res.status(200).json({ message: 'Sign-in successful', user });
+    } catch (error) {
+      console.error('Error during sign-in:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
-
-    // Compare entered password with hashed password
-    const isPasswordValid = await user.comparePassword(password);
-
-    if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    // Generate JWT token
-    const token = generateToken(user._id);
-
-    // Sign-in successful
-    res.status(200).json({ message: 'Sign-in successful', token });
-  } catch (error) {
-    console.error('Error during sign-in:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-};
+  };
+  

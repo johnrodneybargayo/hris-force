@@ -12,7 +12,7 @@ const app = express();
 const router = express.Router();
 
 // MongoDB connection URI and options
-const mongoURI = 'mongodb+srv://hris-eo:7b1kysZMkSpoOKDS@cluster0.ymkqxds.mongodb.net/hrsystem?retryWrites=true&w=majority'; // Replace with your MongoDB connection URI
+const mongoURI = 'mongodb+srv://johnrodneybargayo:N3tBKgZkwzF1wEhR@hrsystem.alub4ez.mongodb.net/?retryWrites=true&w=majority'; // Replace with your MongoDB connection URI
 const dbName = 'hrsystem'; // Replace with your MongoDB database name
 const mongoOptions = {
   useNewUrlParser: true,
