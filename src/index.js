@@ -19,6 +19,12 @@ const mongoOptions = {
   useUnifiedTopology: true,
 };
 
+// Enable CORS
+const corsOptions = {
+  origin: 'https://hrsystem-dev.empireonecontactcenter.com',
+};
+app.use(cors(corsOptions));
+
 // Connect to MongoDB
 mongoose.connect(mongoURI, { ...mongoOptions, dbName })
   .then(() => {
@@ -30,7 +36,6 @@ mongoose.connect(mongoURI, { ...mongoOptions, dbName })
 
 // Middleware
 app.use(bodyParser.json());
-app.use(cors()); // Enable CORS
 app.use('/.netlify/functions/index', router); // Map the router to the specific path
 
 // Routes
@@ -51,7 +56,7 @@ router.post('/auth/sign-in', async (req, res) => {
     // Compare password
     if (await user.comparePassword(password)) {
       // Generate JWT token
-      const secretKey = 'your-secret-key';
+      const secretKey = 'fbbd1ad9b4ce47abbb4c20103b1760f151bce76263db70f5303127a80fe5fa71';
       const token = jwt.sign({ userId: user._id }, secretKey, { expiresIn: '1h' });
 
       // Sign-in successful

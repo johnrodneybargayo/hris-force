@@ -1,5 +1,5 @@
-import { MongoClient } from 'mongodb';
-import * as bcrypt from 'bcrypt';
+const { MongoClient } = require('mongodb');
+const bcrypt = require('bcrypt');
 
 // Connection URL and database name
 const url = 'mongodb+srv://johnrodneybargayo:N3tBKgZkwzF1wEhR@hrsystem.alub4ez.mongodb.net/?retryWrites=true&w=majority';
@@ -9,7 +9,7 @@ const dbName = 'hrsystem';
 const client = new MongoClient(url);
 
 // Function to insert a sample document with roles and hashed password into the existing users collection
-async function insertSampleUserWithRolesAndHashedPassword(): Promise<void> {
+async function insertSampleUserWithRolesAndHashedPassword() {
   try {
     // Connect to the MongoDB server
     await client.connect();
@@ -18,7 +18,7 @@ async function insertSampleUserWithRolesAndHashedPassword(): Promise<void> {
     const db = client.db(dbName);
 
     // Access the existing users collection
-    const usersCollection = db.collection('users');
+    const usersCollection = db.collection('user');
 
     // Generate a salt and hash the password using bcrypt
     const saltRounds = 10;
