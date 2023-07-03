@@ -25,21 +25,19 @@ mongoose.connect(mongoURI, mongoOptions)
 // Define the route that interacts with the MongoDB database
 router.get("/", async (req, res) => {
   try {
-    // Define a Mongoose model
     const ExampleModel = mongoose.model('Example', new mongoose.Schema({
       name: String,
       age: Number
     }));
 
-    // Query the database using the Mongoose model
     const result = await ExampleModel.find();
-
     res.json(result);
   } catch (error) {
     console.error('Error querying MongoDB:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 app.use("/.netlify/functions/index", router);
 
