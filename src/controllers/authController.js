@@ -1,15 +1,17 @@
+// authController.js
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 
-const secretKey = '21008e3b8a0584f7c8951c3c4b4b19539207cda777861c42e32d839aeb1363b8';
+const secretKey = process.env.SECRET_KEY;
+
 
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
     // Find the user in the database
-    const user = await db.collection('users').findOne({ email });
+    const user = await User.findOne({ email });
 
     // Check if user exists and password matches
     if (!user || !bcrypt.compareSync(password, user.password)) {
