@@ -2,7 +2,7 @@ const { MongoClient } = require('mongodb');
 const bcrypt = require('bcrypt');
 
 // Connection URL and database name
-const url = 'mongodb+srv://johnrodneybargayo:N3tBKgZkwzF1wEhR@hrsystem.alub4ez.mongodb.net/?retryWrites=true&w=majority';
+const url = 'mongodb+srv://johnrodneybargayo:SqSB54TJ!NA6tc7@hrsystem.alub4ez.mongodb.net/?retryWrites=true&w=majority';
 const dbName = 'hrsystem';
 
 // Create a new MongoDB client
@@ -18,20 +18,20 @@ async function insertSampleUserWithRolesAndHashedPassword() {
     const db = client.db(dbName);
 
     // Access the existing users collection
-    const usersCollection = db.collection('user');
+    const usersCollection = db.collection('users');
 
     // Generate a salt and hash the password using bcrypt
     const saltRounds = 10;
-    const plainPassword = 'Password123'; // Replace with the actual plain password
+    const plainPassword = 'Password1234'; // Replace with the actual plain password
     const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
 
     // Insert a sample document with roles and hashed password
     const sampleUser = {
-      user_id: 2,
+      user_id: 1,
       first_name: 'Default',
       middle_name: 'test',
       last_name: 'admin',
-      email: 'adminhr@empireonegroup.com',
+      email: 'rodney@empireonegroup.com',
       phone_number: '+63999999999',
       address: 'Carcar City, Cebu',
       education: 'none',

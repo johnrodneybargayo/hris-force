@@ -1,37 +1,29 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const User = require('../models/User');
 
-// Function to generate JWT token
-const generateToken = (userId) => {
-  const secretKey = 'fbbd1ad9b4ce47abbb4c20103b1760f151bce76263db70f5303127a80fe5fa71'; // Replace with your secret key
-  const token = jwt.sign({ userId }, secretKey, { expiresIn: '1h' });
-  return token;
-};
+const secretKey = '21008e3b8a0584f7c8951c3c4b4b19539207cda777861c42e32d839aeb1363b8';
 
-// Sign-in controller
 exports.login = async (req, res) => {
-    const { email, password } = req.query; // Retrieve email and password from query parameters
-  
-    try {
-      // Check if user exists
-      const user = await User.findOne({ email });
-  
-      if (!user) {
-        return res.status(401).json({ error: 'Invalid credentials' });
-      }
-  
-      // Check password
-      const isPasswordValid = await user.comparePassword(password);
-  
-      if (!isPasswordValid) {
-        return res.status(401).json({ error: 'Invalid credentials' });
-      }
-  
-      // User found and password is valid
-      res.status(200).json({ message: 'Sign-in successful', user });
-    } catch (error) {
-      console.error('Error during sign-in:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+  const { email, password } = req.body;
+
+  try {
+    // Find the user in the database
+    const user = await db.collection('users').findOne({ email });
+
+    // Check if user exists and password matches
+    if (!user || !bcrypt.compareSync(password, user.password)) {
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
-  };
-  
+
+    // Generate JWT token
+    const token = jwt.sign({ userId: user._id }, secretKey, {
+      expiresIn: '1h',
+    });
+
+    res.json({ token });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};

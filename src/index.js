@@ -1,85 +1,72 @@
 const express = require('express');
 const serverless = require('serverless-http');
-const mongoose = require('mongoose');
+const MongoClient = require('mongodb').MongoClient;
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const authRoutes = require('./routes/authRoutes');
-const authMiddleware = require('./middlewares/authMiddleware');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('./models/User');
 
 const app = express();
-const router = express.Router();
+const port = 3000;
+const uri = 'mongodb+srv://empireone:hXCieVuIw5DvCX7z@serverlessinstance0.i4tpgor.mongodb.net/?retryWrites=true&w=majority'; // Use the environment variable MONGODB_URI
+const dbName = 'hrsystem_serverless'; // Replace with your MongoDB database name
+const secretKey = '8956022d3c89a8f6df26bb32daa07127b8c605db3d00c52c5babe80eccbd33ec'; // Replace with your own secret key for JWT
 
-// MongoDB connection URI and options
-const mongoURI = 'mongodb+srv://johnrodneybargayo:N3tBKgZkwzF1wEhR@hrsystem.alub4ez.mongodb.net/?retryWrites=true&w=majority'; // Replace with your MongoDB connection URI
-const dbName = 'hrsystem'; // Replace with your MongoDB database name
-const mongoOptions = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-};
-
-// Enable CORS
-const corsOptions = {
-  origin: 'https://hrsystem-dev.empireonecontactcenter.com',
-};
-app.use(cors(corsOptions));
-
-// Connect to MongoDB
-mongoose.connect(mongoURI, { ...mongoOptions, dbName })
-  .then(() => {
-    console.log('Connected to MongoDB');
-  })
-  .catch((error) => {
-    console.error('Error connecting to MongoDB:', error);
-  });
-
-// Middleware
+app.use(cors());
 app.use(bodyParser.json());
-app.use('/.netlify/functions/index', router); // Map the router to the specific path
 
-// Routes
-router.use('/auth', authRoutes);
+// Connect to the MongoDB database
+let db;
 
-// Sign-in controller
-router.post('/auth/sign-in', async (req, res) => {
-  const { email, password } = req.body;
+async function connectToDatabase() {
+  const client = new MongoClient(uri);
+  await client.connect();
+  console.log('Connected to MongoDB');
+  db = client.db(dbName);
+}
 
+// Login route
+app.post('/sign-in', async (req, res) => {
   try {
-    // Check if user exists
-    const user = await User.findOne({ email });
+    const { email, password } = req.body;
+    const user = await db.collection('users').findOne({ email });
 
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+    if (user) {
+      const isPasswordMatched = await bcrypt.compare(password, user.password);
+
+      if (isPasswordMatched) {
+        const accessToken = jwt.sign({ userId: user._id }, secretKey);
+        res.json({ success: true, accessToken });
+      } else {
+        res.status(401).json({ success: false, message: 'Invalid email or password' });
+      }
+    } else {
+      res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
-
-    // Compare password
-    if (await user.comparePassword(password)) {
-      // Generate JWT token
-      const secretKey = 'fbbd1ad9b4ce47abbb4c20103b1760f151bce76263db70f5303127a80fe5fa71';
-      const token = jwt.sign({ userId: user._id }, secretKey, { expiresIn: '1h' });
-
-      // Sign-in successful
-      return res.status(200).json({ message: 'Sign-in successful', token });
-    }
-
-    return res.status(401).json({ error: 'Invalid credentials' });
   } catch (error) {
-    console.error('Error during sign-in:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error during login:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Default route
-router.get("/", (req, res) => {
-  res.send('Welcome to the HR System API');
+// Define and use authRoutes
+const authRoutes = express.Router();
+
+authRoutes.get('/', (req, res) => {
+  // Implement your authentication logic here
+  res.send('Custom authentication logic');
 });
 
-// Export the app wrapped with serverless-http
-module.exports.handler = serverless(app);
+app.use('/auth', authRoutes);
 
 // Start the server
-const PORT = process.env.PORT || 3000; // Use the provided port or 4000 as default
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+connectToDatabase().then(() => {
+  if (require.main === module) {
+    app.listen(port, () => {
+      console.log(`Server listening on port ${port}`);
+    });
+  }
 });
+
+module.exports = app;
+module.exports.handler = serverless(app);

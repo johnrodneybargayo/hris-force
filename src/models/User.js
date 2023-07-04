@@ -1,25 +1,26 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-const userSchema = new mongoose.Schema({
-  id: String,
+const { Schema } = mongoose;
+
+const userSchema = new Schema({
   username: String,
-  email: String,
-  firstName: String,
-  lastName: String,
-  age: Number,
-  password: String
+  password: String,
 });
 
-// Compare entered password with hashed password
-userSchema.methods.comparePassword = async function (enteredPassword) {
-  try {
-    return await bcrypt.compare(enteredPassword, this.password);
-  } catch (error) {
-    throw new Error(error);
+// Hash the password before saving
+userSchema.pre('save', function (next) {
+  const user = this;
+
+  if (!user.isModified('password')) {
+    return next();
   }
-};
 
-const User = mongoose.model('User', userSchema);
+  const salt = bcrypt.genSaltSync(10);
+  const hash = bcrypt.hashSync(user.password, salt);
 
-module.exports = User;
+  user.password = hash;
+  next();
+});
+
+module.exports = mongoose.model('User', userSchema);

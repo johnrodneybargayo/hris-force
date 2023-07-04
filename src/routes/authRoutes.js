@@ -1,9 +1,15 @@
 const express = require('express');
-const router = express.Router();
-const { validateLoginData } = require('../middlewares/authMiddleware');
-const { login } = require('../controllers/authController');
+const { login } = require('../controllers/authController'); // Update the path to the correct controller file
+const authMiddleware = require('../middlewares/authMiddleware'); // Update the path to the correct middleware file
 
-// Sign-in route
-router.get('/sign-in', validateLoginData, login);
+const authRoutes = express.Router();
 
-module.exports = router;
+// Authentication route
+authRoutes.post('/sign-in', login);
+
+// Protected route
+authRoutes.get('/protected', authMiddleware, (req, res) => {
+  res.json({ message: 'Protected route accessed successfully' });
+});
+
+module.exports = authRoutes;

@@ -5,17 +5,20 @@
   "main": "index.js",
   "dependencies": {
     "bcrypt": "^5.1.0",
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.3.1",
-    "netlify-lambda": "^1.4.3",
     "serverless-http": "^1.9.1"
   },
   "scripts": {
     "build": "echo 'Netlify build command'",
-    "start": "node src/index.js"
-    
+    "start": "node src/index.js",
+    "netlify-lambda": "netlify-lambda",
+    "netlify-dev": "netlify-dev",
+    "netlify-build": "npm run build",
+    "netlify-functions-build": "npm run build"
   },
   "author": "rodney",
   "license": "ISC"

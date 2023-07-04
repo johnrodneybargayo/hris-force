@@ -1,11 +1,26 @@
-exports.validateLoginData = (req, res, next) => {
-  const { email, password } = req.body;
+const jwt = require('jsonwebtoken');
 
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password are required' });
+const secretKey = '8956022d3c89a8f6df26bb32daa07127b8c605db3d00c52c5babe80eccbd33ec';
+
+const authMiddleware = (req, res, next) => {
+  const token = req.headers.authorization;
+
+  if (!token) {
+    return res.status(401).json({ message: 'Authorization header missing' });
   }
 
-  // Validation logic here
+  try {
+    // Verify JWT token
+    const decoded = jwt.verify(token, secretKey);
 
-  next();
+    // Attach the decoded user ID to the request
+    req.userId = decoded.userId;
+
+    next();
+  } catch (error) {
+    console.error(error);
+    res.status(401).json({ message: 'Invalid token' });
+  }
 };
+
+module.exports = authMiddleware;
