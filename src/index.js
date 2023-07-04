@@ -6,6 +6,7 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const authRoutes = require('./routes/authRoutes');
+const User = require('./models/User');
 
 require('dotenv').config(); // Load environment variables from .env file
 
@@ -29,6 +30,15 @@ mongoose.connect(uri, {
 
 app.use(bodyParser.json());
 app.use(cors());
+
+app.post('/register', async (req, res) => {
+  try {
+    // User registration code
+  } catch (error) {
+    console.error('Error during user registration:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 app.post('/sign-in', async (req, res) => {
   try {
@@ -56,8 +66,27 @@ app.post('/sign-in', async (req, res) => {
 });
 
 
+app.get('/users/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
 
+    // Check if userId is a valid ObjectId
+    if (!mongoose.isValidObjectId(userId)) {
+      return res.status(400).json({ message: 'Invalid user ID' });
+    }
 
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({ user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 
 app.use('/auth', authRoutes);
