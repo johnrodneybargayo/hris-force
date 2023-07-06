@@ -10,6 +10,7 @@
     "dotenv": "^16.3.1",
     "express": "^4.16.4",
     "jsonwebtoken": "^9.0.0",
+    "mongodb-client-encryption": "^2.8.0",
     "mongodb-connection-string-url": "^2.6.0",
     "mongoose": "^7.3.1",
     "serverless-http": "^1.9.1"
