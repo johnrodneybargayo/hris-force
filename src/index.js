@@ -11,8 +11,8 @@ const User = require('./models/User');
 require('dotenv').config(); // Load environment variables from .env file
 
 const app = express();
-const uri = process.env.MONGODB_URI; // Use the environment variable MONGODB_URI
-const dbName = process.env.MONGODB_DATABASE; // Use the environment variable DB_NAME
+const uri = process.env.MONGO_CONNECTION_STRING; // Use the environment variable MONGO_CONNECTION_STRING
+const dbName = process.env.MONGODB_DATABASE; // Use the environment variable MONGODB_DATABASE
 const secretKey = process.env.SECRET_KEY; // Use the environment variable SECRET_KEY
 
 mongoose.connect(uri, {
@@ -35,7 +35,6 @@ app.use(cors());
 
 app.options('*', cors()); // Enable preflight requests for all routes
 
-
 app.post('/register', async (req, res) => {
   try {
     // User registration code
@@ -56,7 +55,7 @@ app.post('/sign-in', async (req, res) => {
       const isPasswordMatched = await bcrypt.compare(password, user.password);
 
       if (isPasswordMatched) {
-        const accessToken = jwt.sign({ userId: user._id }, process.env.SECRET_KEY);
+        const accessToken = jwt.sign({ userId: user._id }, secretKey);
         res.set('Access-Control-Allow-Origin', 'https://hrsystem-dev.empireonecontactcenter.com');
         res.json({ success: true, accessToken });
       } else {
@@ -95,10 +94,9 @@ app.get('/users/:userId', async (req, res) => {
 
 app.use('/auth', authRoutes);
 
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+const port = process.env.PORT || 8080;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
 
 module.exports = app;

@@ -1,0 +1,5 @@
+runtime: nodejs18
+instance_class: F2
+env_variables:
+  NODE_ENV: production
+  MONGO_CONNECTION_STRING: "mongodb+srv://empireone:hXCieVuIw5DvCX7z@serverlessinstance1.ey8tlta.mongodb.net/?retryWrites=true&w=majority";
