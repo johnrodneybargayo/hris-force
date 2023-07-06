@@ -35,6 +35,7 @@ app.use(cors());
 
 app.options('*', cors()); // Enable preflight requests for all routes
 
+
 app.post('/register', async (req, res) => {
   try {
     // User registration code
