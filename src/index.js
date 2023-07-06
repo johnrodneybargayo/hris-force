@@ -31,10 +31,9 @@ mongoose.connect(uri, {
 app.use(bodyParser.json());
 
 // CORS configuration
-app.use(cors({
-  origin: 'https://hrsystem-dev.empireonecontactcenter.com',
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+app.use(cors());
+
+app.options('*', cors()); // Enable preflight requests for all routes
 
 app.post('/register', async (req, res) => {
   try {
@@ -57,6 +56,7 @@ app.post('/sign-in', async (req, res) => {
 
       if (isPasswordMatched) {
         const accessToken = jwt.sign({ userId: user._id }, process.env.SECRET_KEY);
+        res.set('Access-Control-Allow-Origin', 'https://hrsystem-dev.empireonecontactcenter.com');
         res.json({ success: true, accessToken });
       } else {
         res.status(401).json({ success: false, message: 'Invalid email or password' });
