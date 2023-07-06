@@ -1,9 +1,32 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>HRIS-Force</title>
+  <title>MongoDB Connection Status</title>
 </head>
+
 <body>
-  <script src="script.js"></script>
+  <h1>MongoDB Connection Status:</h1>
+  <p id="status-message">Checking connection status...</p>
+
+  <script>
+    fetch('/.netlify/functions/mongodb')
+      .then(response => response.json())
+      .then(data => {
+        const statusMessageElement = document.getElementById('status-message');
+        if (data.connected) {
+          statusMessageElement.textContent = 'The backend server is connected to MongoDB';
+        } else {
+          statusMessageElement.textContent = 'The backend server is not connected to MongoDB';
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching connection status:', error);
+        const statusMessageElement = document.getElementById('status-message');
+        statusMessageElement.textContent = 'An error occurred while fetching connection status';
+      });
+  </script>
 </body>
+
 </html>
