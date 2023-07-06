@@ -32,22 +32,9 @@ app.use(bodyParser.json());
 
 // CORS configuration
 app.use(cors({
-  origin: '*',
+  origin: 'https://hrsystem-dev.empireonecontactcenter.com',
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-
-// CORS configuration
-const allowedOrigins = ['https://hrsystem-dev.empireonecontactcenter.com'];
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (allowedOrigins.includes(origin) || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-};
-app.use(cors(corsOptions));
 
 app.post('/register', async (req, res) => {
   try {
