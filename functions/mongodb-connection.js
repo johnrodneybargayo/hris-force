@@ -1,7 +1,7 @@
 require('dotenv').config();
 const MongoClient = require('mongodb').MongoClient;
-const uri = process.env.MONGODB_URI; // Use the environment variable MONGODB_URI
-const dbName = process.env.MONGODB_DATABASE; // Use the environment variable DB_NAME
+const uri = 'mongodb+srv://empireone:hXCieVuIw5DvCX7z@serverlessinstance0.i4tpgor.mongodb.net/?retryWrites=true&w=majority'; // Use the environment variable MONGODB_URI
+const dbName = 'hrsystem_serverless';
 
 let client = null;
 
