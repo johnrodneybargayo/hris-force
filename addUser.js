@@ -2,8 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 // MongoDB connection string
-const connectionURL = 'mongodb+srv://empireone:hXCieVuIw5DvCX7z@serverlessinstance1.ey8tlta.mongodb.net/?retryWrites=true&w=majority';
-
+const connectionURL = 'mongodb+srv://empireone:hXCieVuIw5DvCX7z@serverlessinstance1.ey8tlta.mongodb.net/hrsystem_serverlessdb?retryWrites=true&w=majority';
 
 // User schema
 const userSchema = new mongoose.Schema({
