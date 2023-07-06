@@ -6,7 +6,7 @@
 [[headers]]
   for = "/*"
   [headers.values]
-  Access-Control-Allow-Origin = "*"
+  Access-Control-Allow-Origin = "https://hrsystem-dev.empireonecontactcenter.com/"
 
 [build]
   command = "npm run build"
