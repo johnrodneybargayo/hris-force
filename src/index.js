@@ -31,6 +31,12 @@ mongoose.connect(uri, {
 app.use(bodyParser.json());
 
 // CORS configuration
+app.use(cors({
+  origin: '*',
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
+// CORS configuration
 const allowedOrigins = ['https://hrsystem-dev.empireonecontactcenter.com'];
 const corsOptions = {
   origin: function (origin, callback) {
