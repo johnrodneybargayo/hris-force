@@ -29,7 +29,19 @@ mongoose.connect(uri, {
   });
 
 app.use(bodyParser.json());
-app.use(cors());
+
+// CORS configuration
+const allowedOrigins = ['https://hrsystem-dev.empireonecontactcenter.com'];
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+};
+app.use(cors(corsOptions));
 
 app.post('/register', async (req, res) => {
   try {
@@ -65,7 +77,6 @@ app.post('/sign-in', async (req, res) => {
   }
 });
 
-
 app.get('/users/:userId', async (req, res) => {
   try {
     const userId = req.params.userId;
@@ -87,7 +98,6 @@ app.get('/users/:userId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-
 
 app.use('/auth', authRoutes);
 
