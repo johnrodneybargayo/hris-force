@@ -2,4 +2,5 @@ runtime: nodejs18
 instance_class: F2
 env_variables:
   NODE_ENV: production
-  MONGO_CONNECTION_STRING: "mongodb+srv://empireone:hXCieVuIw5DvCX7z@serverlessinstance1.ey8tlta.mongodb.net/hrsystem_serverlessdb?retryWrites=true&w=majority";
+  MONGO_CONNECTION_STRING: "mongodb+srv://empireone:hXCieVuIw5DvCX7z@serverlessinstance1.ey8tlta.mongodb.net/hrserverless_db?retryWrites=true&w=majority";
+  JWT_SECRET_KEY: "431dd5dddcde37181d3816f9e604083693b7fc52873db4a8f2b009d51a23937f"

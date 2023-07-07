@@ -1,31 +1,33 @@
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const User = require('../models/User');
-require('dotenv').config();
+const bcrypt = require("bcrypt");
+const User = require("../models/User");
+const auth = require('../helpers/auth'); // Import the auth module
 
-const secretKey = process.env.SECRET_KEY;
+// Check if email exists
+module.exports.emailExists = (params) => {
+  return User.find({ email: params.email }).then((resultFromFind) => {
+    return resultFromFind.length > 0;
+  });
+};
 
+// User login
+module.exports.login = (params) => {
+  const { email, password } = params;
 
-exports.login = async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    // Find the user in the database
-    const user = await User.findOne({ email });
-
-    // Check if user exists and password matches
-    if (!user || !bcrypt.compareSync(password, user.password)) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+  return User.findOne({ email: email }).then((user) => {
+    if (!user) {
+      return { error: 'user-not-found' };
     }
 
-    // Generate JWT token
-    const token = jwt.sign({ userId: user._id }, secretKey, {
-      expiresIn: '1h',
-    });
+    if (user.loginType !== 'email') {
+      return { error: 'login-type-error' };
+    }
 
-    res.json({ token });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
+    const isPasswordMatched = bcrypt.compareSync(password, user.password);
+
+    if (isPasswordMatched) {
+      return { access: auth.createAccessToken(user.toObject()) };
+    } else {
+      return { error: 'incorrect-password' };
+    }
+  });
 };

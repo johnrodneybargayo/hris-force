@@ -1,15 +1,18 @@
 const express = require('express');
-const { login } = require('../controllers/authController');
-const authMiddleware = require('../middlewares/authMiddleware');
+const router = express.Router();
+const UserController = require('../controllers/authController');
+const authMiddleware = require('../middleware/authMiddleware'); // Import the authMiddleware module
 
-const authRoutes = express.Router();
-
-// Authentication route
-authRoutes.post('/login', login);
-
-// Protected route
-authRoutes.get('/protected', authMiddleware, (req, res) => {
-  res.json({ message: 'Protected route accessed successfully' });
+// POST /auth/login
+router.post('/login', (req, res) => {
+  UserController.login(req.body).then((result) => {
+    res.send(result);
+  });
 });
 
-module.exports = authRoutes;
+// Protected route example: requires authentication
+router.get('/protected', authMiddleware, (req, res) => {
+  res.send('This is a protected route');
+});
+
+module.exports = router;

@@ -1,29 +1,34 @@
-// User.js
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const mongoose = require("mongoose")
 
-const { Schema } = mongoose;
+const userSchema = new mongoose.Schema({
+	firstName: {
+		type: String,
+		required: [true, "First name is required"]
+	},
+	lastName: {
+		type: String,
+		required: [true, "Last name is required"]
+	},
+	email: {
+		type: String,
+		required: [true, "Email is required"]
+	},
+	password: {
+		type: String
+		// required: [true, "Password is required"]
+	},
+	isAdmin: {
+		type: Boolean,
+		default: false
+	},
+	mobileNo: {
+		type: String
+		// required: [true, "Mobile number is required"]
+	},
+	loginType: {
+		type: String,
+		required: [true, 'Login type is required']
+	},
+})
 
-const userSchema = new Schema({
-  email: String,
-  password: String,
-});
-
-// Hash the password before saving
-userSchema.pre('save', async function (next) {
-  try {
-    if (!this.isModified('password')) {
-      return next();
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(this.password, salt);
-
-    this.password = hash;
-    next();
-  } catch (error) {
-    return next(error);
-  }
-});
-
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model("User", userSchema)
