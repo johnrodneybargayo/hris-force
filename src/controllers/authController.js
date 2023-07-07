@@ -1,33 +1,58 @@
-const bcrypt = require("bcrypt");
-const User = require("../models/User");
-const auth = require('../helpers/auth'); // Import the auth module
+const User = require('../models/User');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
-// Check if email exists
-module.exports.emailExists = (params) => {
-  return User.find({ email: params.email }).then((resultFromFind) => {
-    return resultFromFind.length > 0;
-  });
+const secretKey = '431dd5dddcde37181d3816f9e604083693b7fc52873db4a8f2b009d51a23937f';
+
+const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Find the user by email
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(401).header('WWW-Authenticate', 'Bearer').json({ error: 'Invalid email or password' });
+    }
+
+    // Check if the password matches
+    const isPasswordValid = bcrypt.compareSync(password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).header('WWW-Authenticate', 'Bearer').json({ error: 'Invalid email or password' });
+    }
+
+    // Create a JWT token for the user
+    const token = jwt.sign({ userId: user._id }, secretKey, { expiresIn: '1h' });
+
+    // Return the token to the client as JSON
+    res.json({ token, message: 'Login successful' });
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ error: 'An error occurred during login' });
+  }
 };
 
-// User login
-module.exports.login = (params) => {
-  const { email, password } = params;
+const getUser = async (req, res) => {
+  const { userId } = req.params;
 
-  return User.findOne({ email: email }).then((user) => {
+  try {
+    // Fetch the user from the database based on the user ID
+    const user = await User.findById(userId);
+
     if (!user) {
-      return { error: 'user-not-found' };
+      return res.status(404).json({ error: 'User not found' });
     }
 
-    if (user.loginType !== 'email') {
-      return { error: 'login-type-error' };
-    }
+    // Return the user data to the client as JSON
+    res.json({ user });
+  } catch (error) {
+    console.error('Error retrieving user:', error);
+    res.status(500).json({ error: 'An error occurred while retrieving user' });
+  }
+};
 
-    const isPasswordMatched = bcrypt.compareSync(password, user.password);
-
-    if (isPasswordMatched) {
-      return { access: auth.createAccessToken(user.toObject()) };
-    } else {
-      return { error: 'incorrect-password' };
-    }
-  });
+module.exports = {
+  login,
+  getUser,
 };

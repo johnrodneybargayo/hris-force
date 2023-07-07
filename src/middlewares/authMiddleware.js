@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-
 const secretKey = process.env.JWT_SECRET_KEY;
 
 const authMiddleware = (req, res, next) => {
@@ -11,12 +10,16 @@ const authMiddleware = (req, res, next) => {
 
   try {
     // Verify JWT token
-    const decoded = jwt.verify(token, secretKey);
+    jwt.verify(token, secretKey, (err, decoded) => {
+      if (err) {
+        return res.status(401).json({ message: 'Invalid token' });
+      }
 
-    // Attach the decoded user ID to the request
-    req.userId = decoded.userId;
+      // Attach the decoded user ID to the request
+      req.userId = decoded.id;
 
-    next();
+      next();
+    });
   } catch (error) {
     console.error(error);
     res.status(401).json({ message: 'Invalid token' });

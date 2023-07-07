@@ -1,69 +1,122 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const Joi = require('joi');
+require('dotenv').config();
 
-// MongoDB connection string
-const connectionURL = 'mongodb+srv://empireone:hXCieVuIw5DvCX7z@serverlessinstance1.ey8tlta.mongodb.net/hrsystem_serverlessdb?retryWrites=true&w=majority';
+const MONGO_CONNECTION_STRING = 'mongodb+srv://empireone:hXCieVuIw5DvCX7z@serverlessinstance1.ey8tlta.mongodb.net/?retryWrites=true&w=majority';
+const MONGODB_DATABASE = 'hrserverless_db';
+const MONGODB_COLLECTION = 'users';
 
-// User schema
-const userSchema = new mongoose.Schema({
-  first_name: String,
-  middle_name: String,
-  last_name: String,
-  email: String,
-  phone_number: String,
-  address: String,
-  education: String,
-  occupation: String,
-  position: String,
-  birthdate: Date,
-  hobbies: [String],
-  password: String,
-  role: String,
-  isAdmin: Boolean
+mongoose.connect(MONGO_CONNECTION_STRING, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  dbName: MONGODB_DATABASE,
+}).then(() => {
+  console.log('Connected to MongoDB');
+}).catch((error) => {
+  console.error('Error connecting to MongoDB:', error);
+  process.exit(1);
 });
 
-// User model
+const userSchema = new mongoose.Schema({
+  firstName: {
+    type: String,
+    required: true,
+  },
+  lastName: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  phoneNumber: {
+    type: String,
+    required: true,
+  },
+  age: {
+    type: Number,
+    required: true,
+  },
+  hobby: {
+    type: String,
+    required: true,
+  },
+  address: {
+    type: String,
+    required: true,
+  },
+  gender: {
+    type: String,
+    required: true,
+  },
+  birthdate: {
+    type: Date,
+    required: true,
+  },
+  isAdmin: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+userSchema.methods.generateAuthToken = function () {
+  const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+  return token;
+};
+
 const User = mongoose.model('User', userSchema);
 
-async function addUser() {
+// Create a user
+const createUser = async () => {
+  const newUser = new User({
+    firstName: 'HR',
+    lastName: 'admin test',
+    email: 'adminhr@empireonegroup.com',
+    password: await bcrypt.hash('password123', 10),
+    phoneNumber: '1234567890',
+    age: 27,
+    hobby: 'Reading',
+    address: '123 Street, City',
+    gender: 'other',
+    birthdate: new Date('1995-01-01'),
+    isAdmin: true,
+  });
+
   try {
-    // Connect to the MongoDB database
-    await mongoose.connect(connectionURL, { useNewUrlParser: true, useUnifiedTopology: true });
+    const savedUser = await newUser.save();
+    console.log('User created:', savedUser);
 
-    // Generate salt and hash the password
-    const saltRounds = 10;
-    const password = 'Password1234'; // Replace with the desired password
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-    // Create a new user object
-    const newUser = new User({
-      first_name: 'Default',
-      middle_name: 'test',
-      last_name: 'admin',
-      email: 'rodney@empireonegroup.com',
-      phone_number: '+63999999999',
-      address: 'Carcar City, Cebu',
-      education: 'none',
-      occupation: 'Software Engineer',
-      position: 'HR System',
-      birthdate: new Date('1995-10-19'),
-      hobbies: ['Reading', 'Gaming', 'Cooking'],
-      password: hashedPassword,
-      role: 'isAdmin',
-      isAdmin: true
-    });
-
-    // Save the user to the database
-    await newUser.save();
-
-    console.log('User added successfully.');
+    const token = savedUser.generateAuthToken();
+    console.log('Generated token:', token);
   } catch (error) {
-    console.error('Error adding user:', error);
-  } finally {
-    // Disconnect from the MongoDB database
-    mongoose.disconnect();
+    console.error('Error creating user:', error);
   }
-}
+};
 
-// Call the addUser function to add the user
-addUser();
+createUser();
+
+const validate = (user) => {
+  const schema = Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string().required(),
+    phoneNumber: Joi.string(),
+    age: Joi.number(),
+    hobby: Joi.string(),
+    address: Joi.string(),
+    firstName: Joi.string(),
+    lastName: Joi.string(),
+    gender: Joi.string().valid('Male', 'Female', 'Other'),
+    birthdate: Joi.date(),
+  });
+  return schema.validate(user);
+};
+
+module.exports = { User, validate };
