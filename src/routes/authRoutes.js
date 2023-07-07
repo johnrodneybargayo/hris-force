@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { User, validate } = require('../models/User');
+const authMiddleware = require('../middlewares/authMiddleware');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -24,5 +25,20 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: 'An error occurred during login' });
   }
 });
+
+router.get('/me', authMiddleware, async (req, res) => {
+	try {
+	  const user = await User.findById(req.userId).select('-password -__v');
+	  if (!user) {
+		return res.status(404).json({ error: 'User not found' });
+	  }
+	  res.json(user);
+	} catch (error) {
+	  console.error(error);
+	  res.status(500).json({ error: 'An error occurred' });
+	}
+  });
+  
+  
 
 module.exports = router;
