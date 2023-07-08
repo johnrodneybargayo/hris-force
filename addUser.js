@@ -65,6 +65,10 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  token: {
+    type: String,
+    default: false,
+  },
 });
 
 userSchema.methods.generateAuthToken = function () {
@@ -79,8 +83,8 @@ const createUser = async () => {
   const newUser = new User({
     firstName: 'HR',
     lastName: 'admin test',
-    email: 'adminhr@empireonegroup.com',
-    password: await bcrypt.hash('password123', 10),
+    email: 'admin@admin.com',
+    password: await bcrypt.hash('admin', 10),
     phoneNumber: '1234567890',
     age: 27,
     hobby: 'Reading',
