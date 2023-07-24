@@ -3,8 +3,9 @@ const serverless = require('serverless-http');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const authRoutes = require('./routes/authRoutes'); // Import the router module
-const users = require('./routes/users'); // Import the router module
+const authRoutes = require('./routes/authRoutes');
+const users = require('./routes/users');
+const inventoryRoutes = require('./routes/inventoryRoutes'); // Import the router module for inventory
 
 require('dotenv').config();
 
@@ -33,6 +34,9 @@ app.options('*', cors());
 app.use(express.json());
 app.use("/api/users", users);
 app.use("/api/login", authRoutes);
+app.use("/api/inventory", inventoryRoutes); // Add the route for inventory
+
+// ... Other code
 
 const port = process.env.PORT || 8080;
 app.listen(port, () => {
