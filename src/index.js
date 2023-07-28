@@ -5,7 +5,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const users = require('./routes/users');
-const inventoryRoutes = require('./routes/inventoryRoutes'); // Import the router module for inventory
+const inventoryRoutes = require('./routes/inventoryRoutes');
+const emailRoutes = require('./routes/emailRoutes'); // Import the email routes
 
 require('dotenv').config();
 
@@ -30,11 +31,12 @@ app.use(bodyParser.json());
 app.use(cors());
 app.options('*', cors());
 
-// Use the router module
+// Use the router modules
 app.use(express.json());
 app.use("/api/users", users);
 app.use("/api/login", authRoutes);
-app.use("/api/inventory", inventoryRoutes); // Add the route for inventory
+app.use("/api/inventory", inventoryRoutes);
+app.use("/api/emails", emailRoutes); // Add the email routes
 
 // ... Other code
 
