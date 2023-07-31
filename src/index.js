@@ -9,6 +9,7 @@ const inventoryRoutes = require('./routes/inventoryRoutes');
 const emailRoutes = require('./routes/emailRoutes'); // Import the email routes
 const applicantRoutes = require('./routes/applicantRoutes'); // Import the applicant routes
 const uploadImageRoutes = require('./routes/uploadImage'); // Import the uploadImage routes
+const path = require('path');
 
 require('dotenv').config();
 
@@ -33,12 +34,13 @@ mongoose.connect(uri, {
 app.use(bodyParser.json());
 app.use(cors());
 app.options('*', cors());
-app.use(cors({
-  origin: 'http://hrsystem-dev.empireonecontactcenter.com',
-}));
+
 
 // Serve static files from the 'uploads' directory
+// app.use('/uploads', express.static('uploads'));
+// Assuming 'express' is imported and your app is defined as 'app'
 app.use('/uploads', express.static('uploads'));
+
 
 
 // Routes
