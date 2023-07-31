@@ -15,3 +15,12 @@ handlers:
   - url: /api/uploadImage
     script: auto
     secure: always
+
+# Add the following handler to serve the 'uploads' directory as a static resource
+- url: /uploads
+  static_dir: uploads
+
+- url: /.*
+  secure: always
+  redirect_http_response_code: 301
+  script: auto
