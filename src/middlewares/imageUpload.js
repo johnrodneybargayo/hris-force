@@ -1,7 +1,6 @@
-const express = require('express');
-const router = express.Router();
 const multer = require('multer');
 const path = require('path');
+const Image = require('../models/Image'); // Import the Image model
 const crypto = require('crypto');
 
 // Create a storage engine for multer to handle file uploads
@@ -17,21 +16,25 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-router.post('/', upload.single('image'), (req, res) => {
+const handleFileUpload = async (req, res, next) => {
   try {
     if (!req.file) {
       throw new Error('No file uploaded');
     }
-    
-    // Get the public image URL after the image is uploaded
-    const imageUrl = `https://empireone-global-inc.uc.r.appspot.com/uploads/${req.file.filename}`;
+    const imageUrl = req.file.filename;
 
-    // Return the public image URL in the API response
-    res.status(200).json({ imageUrl });
+    const newImage = new Image({
+      imageUrl: imageUrl,
+    });
+
+    const savedImage = await newImage.save();
+
+    req.savedImage = savedImage;
+    next();
   } catch (error) {
     console.error('Error uploading image:', error);
     res.status(500).json({ error: 'An error occurred while uploading the image' });
   }
-});
+};
 
-module.exports = router;
+module.exports = { upload, handleFileUpload };
