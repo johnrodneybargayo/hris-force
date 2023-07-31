@@ -17,11 +17,12 @@ const app = express();
 const uri = process.env.MONGO_CONNECTION_STRING;
 const dbName = process.env.MONGODB_DATABASE;
 
-mongoose.connect(uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  dbName: dbName,
-})
+mongoose
+  .connect(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    dbName: dbName,
+  })
   .then(() => {
     console.log('Connected to MongoDB');
   })
@@ -32,24 +33,33 @@ mongoose.connect(uri, {
 
 // Middleware
 app.use(bodyParser.json());
-app.use(cors());
+const allowedOrigins = ['https://hrsystem-dev.empireonecontactcenter.com'];
+
+// Set up CORS options
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+};
+
+// Enable CORS with the configured options
+app.use(cors(corsOptions));
 app.options('*', cors());
 
-
 // Serve static files from the 'uploads' directory
-// app.use('/uploads', express.static('uploads'));
-// Assuming 'express' is imported and your app is defined as 'app'
 app.use('/uploads', express.static('uploads'));
 
-
-
 // Routes
-app.use("/api/users", users);
-app.use("/api/login", authRoutes);
-app.use("/api/inventory", inventoryRoutes);
-app.use("/api/emails", emailRoutes); // Add the email routes
-app.use("/api/applicants", applicantRoutes); // Add the applicant routes
-app.use("/api/uploadImage", uploadImageRoutes); // Add the uploadImage routes
+app.use('/api/users', users);
+app.use('/api/login', authRoutes);
+app.use('/api/inventory', inventoryRoutes);
+app.use('/api/emails', emailRoutes); // Add the email routes
+app.use('/api/applicants', applicantRoutes); // Add the applicant routes
+app.use('/api/uploadImage', uploadImageRoutes); // Add the uploadImage routes
 
 // Error handling middleware
 app.use((err, req, res, next) => {
