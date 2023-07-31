@@ -33,9 +33,13 @@ mongoose.connect(uri, {
 app.use(bodyParser.json());
 app.use(cors());
 app.options('*', cors());
+app.use(cors({
+  origin: 'http://hrsystem-dev.empireonecontactcenter.com',
+}));
 
 // Serve static files from the 'uploads' directory
 app.use('/uploads', express.static('uploads'));
+
 
 // Routes
 app.use("/api/users", users);
