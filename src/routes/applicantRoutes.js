@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // POST /api/applicants
-router.post('/', async (req, res) => {
+router.post('/', upload.single('image'), async (req, res) => {
   try {
     const {
       companyId,
@@ -56,7 +56,6 @@ router.post('/', async (req, res) => {
       alternatePhoneNumber,
       relationship,
       workExperiences,
-      image,
     } = req.body;
 
     const newApplicant = new Applicant({
@@ -94,7 +93,7 @@ router.post('/', async (req, res) => {
       alternatePhoneNumber,
       relationship,
       workExperiences,
-      image,
+      image: req.file.filename, // Store the filename of the uploaded image in the "image" field
     });
 
     const savedApplicant = await newApplicant.save();

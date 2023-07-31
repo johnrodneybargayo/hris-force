@@ -8,6 +8,8 @@ const users = require('./routes/users');
 const inventoryRoutes = require('./routes/inventoryRoutes');
 const emailRoutes = require('./routes/emailRoutes'); // Import the email routes
 const applicantRoutes = require('./routes/applicantRoutes'); // Import the applicant routes
+const uploadImageRoutes = require('./routes/uploadImage'); // Import the uploadImage routes
+ 
 
 require('dotenv').config();
 
@@ -39,6 +41,8 @@ app.use("/api/login", authRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/emails", emailRoutes); // Add the email routes
 app.use("/api/applicants", applicantRoutes); // Add the applicant routes
+app.use("/api/uploadImage", uploadImageRoutes); // Add the uploadImage routes
+
 
 // ... Other code
 
