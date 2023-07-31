@@ -6,21 +6,17 @@ env_variables:
   JWT_SECRET_KEY: '431dd5dddcde37181d3816f9e604083693b7fc52873db4a8f2b009d51a23937f'
   SALT: '10'
   PORT: '8080'
-  API_KEY: 'YOUR_API_KEY'
-  CLIENT_ID: 'YOUR_CLIENT_ID'
-  CLIENT_SECRET: 'YOUR_CLIENT_SECRET'
-  GMAIL_USER_REFRESH_TOKEN: 'YOUR_GMAIL_USER_REFRESH_TOKEN'
-  
+  API_KEY: 'AIzaSyAI1NsFZrRaBSRCtj8TkIxA3Mg-qYFDRzg'
+  CLIENT_ID: '699215781260-odsjje0uf982v9uqut3t0uro8qrkbea7.apps.googleusercontent.com'
+  CLIENT_SECRET: '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'
+  GMAIL_USER_REFRESH_TOKEN: 'ya29.a0AbVbY6P9ok-s2IDSMcWhb0JuV6GSUJKeUn5LS0Z_QXLQSLMLQGI3KWnxmH7JHP74VLSC-OEjSduKx4zXYLYo5NNxHJhDDgYJUWdVrnmFP2mOreC7j6NqKpvIdDoxCOLXdyE2ALXzdaV4Y0_20BOp1kPEd7T0aCgYKAdYSARMSFQFWKvPlTbcIqX80C9fPscH0ll0YaQ0163'
+  BUCKET_NAME: 'hrsystem_bucket1'
+
 handlers:
   - url: /api/uploadImage
     script: auto
     secure: always
-
-# Add the following handler to serve the 'uploads' directory as a static resource
-- url: /uploads
-  static_dir: uploads
-
-- url: /.*
-  secure: always
-  redirect_http_response_code: 301
-  script: auto
+  - url: /images/(.*\.(png|jpg|jpeg|gif|bmp|webp))$
+    secure: always
+    static_files: uploads/\1
+    upload: uploads/(.*\.(png|jpg|jpeg|gif|bmp|webp))$
