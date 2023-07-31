@@ -15,7 +15,7 @@ const oAuth2Client = new google.auth.OAuth2(
 );
 
 const GMAIL_USER_EMAIL = 'career@empireonegs.com';
-const GMAIL_USER_REFRESH_TOKEN = 'ya29.a0AbVbY6PnSWnrlDZploNdNshR7oIpBHI_JTno_zEHbT7TF5hmi9LgZx3hF48n8Y7ozSbY4rLHlofT5oqISmCGBQngIe7AV52AAdyDEQ-2m5oguh4zHU4njbCblvIkhtWPCD0zUi3FWSvxZbOw8xmjpay6FeKjaCgYKAcQSARMSFQFWKvPlJUXfSqMmqrxDjZP7bKSosQ0163';
+const GMAIL_USER_REFRESH_TOKEN = 'ya29.a0AbVbY6OaXI323B3uilGk2VwUTp-7CIzsymJmFUUG1EPRHmf2pxBOhGiafLAzF3JUpTXr0XEafISgVzuMG0Z6GG_ORnvAFxGT_RW8QSxhUGYzGxiugUQrpIpQnuobnkNuYMrIhSb2aHIudcG-ZI8Qmg4tahcPaCgYKAa4SARMSFQFWKvPlPXT3Vkuvikj0byFxsr9-vw0163';
 
 oAuth2Client.setCredentials({
   refresh_token: GMAIL_USER_REFRESH_TOKEN,
