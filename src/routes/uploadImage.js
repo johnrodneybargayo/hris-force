@@ -20,31 +20,21 @@ const upload = multer({ storage });
 
 const handleFileUpload = async (req, res, next) => {
   try {
-    // Check if a file was uploaded
     if (!req.file) {
       throw new Error('No file uploaded');
     }
-
-    // Get the filename of the uploaded file
     const imageUrl = req.file.filename;
 
-    // Create a new Image object with the imageUrl property set to the filename
     const newImage = new Image({
       imageUrl: imageUrl,
     });
 
-    // Save the new Image object to the database
     const savedImage = await newImage.save();
 
-    // Set the savedImage variable to the req object for use in the next middleware function
     req.savedImage = savedImage;
-
-    // Call the next middleware function
     next();
   } catch (error) {
     console.error('Error uploading image:', error);
-
-    // Send an error message to the client with a 500 status code
     res.status(500).json({ error: 'An error occurred while uploading the image' });
   }
 };
