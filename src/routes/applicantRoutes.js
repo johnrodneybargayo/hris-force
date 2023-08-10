@@ -32,4 +32,22 @@ router.get('/list', async (req, res) => {
   }
 });
 
+router.get('/list/:id', async (req, res) => {
+  try {
+    const applicantId = req.params.id; // Get the applicant ID from the URL parameter
+    const applicant = await ApplicantModel.findById(applicantId);
+
+    if (!applicant) {
+      // If applicant is not found, return a 404 response
+      return res.status(404).json({ error: 'Applicant not found' });
+    }
+
+    res.status(200).json(applicant); // Respond with the applicant data
+  } catch (error) {
+    console.error('Error getting applicant:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 module.exports = router;
