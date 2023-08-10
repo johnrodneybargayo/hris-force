@@ -1,51 +1,71 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const applicantSchema = new mongoose.Schema({
-  companyId: { type: String, required: true },
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
-  middleName: { type: String },
-  mobileNumber: { type: String, required: true },
-  addressLine1: { type: String, required: true },
-  addressLine2: { type: String },
-  postcode: { type: String, required: true },
-  state: { type: String, required: true },
-  area: { type: String },
-  emailId: { type: String, required: true },
-  education: { type: String },
-  country: { type: String },
-  stateRegion: { type: String },
-  experience: { type: String },
-  additionalDetails: { type: String },
-  provincialAddress: { type: String },
-  currentAddress: { type: String },
-  phoneNumber: { type: String, required: true },
-  emailAddress: { type: String, required: true },
-  dateOfBirth: { type: String },
-  placeOfBirth: { type: String },
-  maritalStatus: { type: String },
-  gender: { type: String },
-  courseGraduated: { type: String },
-  yearGraduated: { type: String },
-  school: { type: String },
-  mothersMaidenName: { type: String },
-  fathersName: { type: String },
-  familyMembers: { type: String },
-  contactPerson: { type: String },
-  alternatePhoneNumber: { type: String },
-  relationship: { type: String },
-  workExperiences: [
-    {
-      company: { type: String },
-      position: { type: String },
-      companyAddress: { type: String },
-      dateHired: { type: String },
-      dateResigned: { type: String },
-    },
-  ],
-  image: { type: String }, // New property for image URL (or image filename)
+const { Schema } = mongoose;
+
+// Enumerations for Gender and Marital Status
+const GenderEnum = Object.freeze({
+  Female: "female",
+  Male: "male",
+  Other: "other",
 });
 
-const Applicant = mongoose.model('Applicant', applicantSchema);
+const MaritalStatusEnum = Object.freeze({
+  Single: "single",
+  Married: "married",
+  Divorced: "divorced",
+  Widowed: "widowed",
+  Other: "other",
+});
 
-module.exports = Applicant;
+// Create the applicants schema
+const applicantSchema = new Schema({
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  middleName: { type: String, required: true },
+  mobileNumber: { type: String, required: true },
+  email: { type: String, required: true },
+  dateOfBirth: { type: Date, required: true },
+  placeOfBirth: { type: String, required: true },
+  gender: {
+    type: String,
+    enum: Object.values(GenderEnum),
+    required: true,
+  },
+  maritalStatus: {
+    type: String,
+    enum: Object.values(MaritalStatusEnum),
+    required: true,
+  },
+  currentAddress: { type: String, required: true },
+  permanentAddress: { type: String, required: true },
+  barangay: { type: String, required: true },
+  postcode: { type: String, required: true },
+  city: { type: String, required: true },
+  state: { type: String, required: true },
+  country: { type: String, required: true },
+  schoolName: { type: String, required: true },
+  courseGraduated: { type: String, required: true },
+  yearGraduated: { type: String, required: true },
+  emergencyName: { type: String, required: true },
+  emergencyContactNumber: { type: String, required: true },
+  emergencyAlternateContactNumber: { type: String, required: true },
+  emergencyRelationship: { type: String, required: true },
+  sssNumber: { type: String, required: true },
+  tinNumber: { type: String, required: true },
+  philHealthId: { type: String, required: true },
+  fatherName: { type: String, required: true },
+  motherMaidenName: { type: String, required: true },
+  companyName: { type: String, required: true },
+  position: { type: String, required: true },
+  dateHired: { type: Date },
+  dateResigned: { type: Date },
+  companyName2: { type: String },
+  position2: { type: String },
+  dateHired2: { type: Date },
+  dateResigned2: { type: Date },
+});
+
+// Create and export the "applicants" model
+const ApplicantModel = mongoose.model("applicants", applicantSchema);
+
+module.exports = ApplicantModel;

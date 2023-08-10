@@ -1,47 +1,45 @@
-const express = require('express');
-const serverless = require('serverless-http');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const authRoutes = require('./routes/authRoutes');
-const users = require('./routes/users');
-const inventoryRoutes = require('./routes/inventoryRoutes');
-const emailRoutes = require('./routes/emailRoutes'); // Import the email routes
-const applicantRoutes = require('./routes/applicantRoutes'); // Import the applicant routes
-const uploadImageRoutes = require('./routes/uploadImage'); // Import the uploadImage routes
-const path = require('path');
+const express = require("express");
+const serverless = require("serverless-http");
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const authRoutes = require("./routes/authRoutes");
+const users = require("./routes/users");
+const inventoryRoutes = require("./routes/inventoryRoutes");
+const emailRoutes = require("./routes/emailRoutes"); // Import the email routes
+const applicantRoutes = require("./routes/applicantRoutes"); // Import the applicant routes
+const uploadImageRoutes = require("./routes/uploadImage"); // Import the uploadImage routes
 
-require('dotenv').config();
+const path = require("path");
+
+require("dotenv").config();
 
 const app = express();
 const uri = process.env.MONGO_CONNECTION_STRING;
 const dbName = process.env.MONGODB_DATABASE;
 
-mongoose.connect(uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  dbName: dbName,
-})
+mongoose
+  .connect(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    dbName: dbName,
+  })
   .then(() => {
-    console.log('Connected to MongoDB');
+    console.log("Connected to MongoDB");
   })
   .catch((error) => {
-    console.error('Error connecting to MongoDB:', error);
+    console.error("Error connecting to MongoDB:", error);
     process.exit(1);
   });
 
 // Middleware
 app.use(bodyParser.json());
 app.use(cors());
-app.options('*', cors());
-
-
+app.options("*", cors());
 
 // Serve static files from the 'uploads' directory
-// app.use('/uploads', express.static('uploads'));
+//app.use('/uploads', express.static('uploads'));
 // Assuming 'express' is imported and your app is defined as 'app'
-
-
 
 // Routes
 app.use("/api/users", users);
@@ -53,8 +51,8 @@ app.use("/api/uploadImage", uploadImageRoutes); // Add the uploadImage routes
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('Error occurred:', err);
-  res.status(500).json({ error: 'An unexpected error occurred' });
+  console.error("Error occurred:", err);
+  res.status(500).json({ error: "An unexpected error occurred" });
 });
 
 const port = process.env.PORT || 8080;
