@@ -16,6 +16,18 @@ handlers:
   - url: /api/uploadImage
     script: auto
     secure: always
+    - url: /api/applicants/lsit
+    script: auto
+    secure: always
+    - url: /api/applicants
+    script: auto
+    secure: always
+    - url: /api/applicants/create
+    script: auto
+    secure: always
+    - url: /api/applicants/update-status
+    script: auto
+    secure: always
   - url: /images/(.*\.(png|jpg|jpeg|gif|bmp|webp))$
     secure: always
     static_files: uploads/\1
