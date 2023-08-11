@@ -16,16 +16,16 @@ handlers:
   - url: /api/uploadImage
     script: auto
     secure: always
-    - url: /api/applicants/lsit
+  - url: /api/applicants/list
     script: auto
     secure: always
-    - url: /api/applicants
+  - url: /api/applicants
     script: auto
     secure: always
-    - url: /api/applicants/create
+  - url: /api/applicants/create
     script: auto
     secure: always
-    - url: /api/applicants/update-status
+  - url: /api/applicants/update-status  # New URL handler for updating status
     script: auto
     secure: always
   - url: /images/(.*\.(png|jpg|jpeg|gif|bmp|webp))$
