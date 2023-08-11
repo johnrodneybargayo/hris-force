@@ -75,7 +75,7 @@ const applicantSchema = new Schema({
     enum: Object.values(StatusEnum),
     default: StatusEnum.Interview, // Set the default status
   },
-  positionApplied: {type: string, required: true },
+  positionApplied: {type: String, required: true },
 });
 
 // Create and export the "applicants" model
