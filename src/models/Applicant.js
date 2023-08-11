@@ -2,6 +2,14 @@ const mongoose = require("mongoose");
 
 const { Schema } = mongoose;
 
+
+const StatusEnum = Object.freeze({
+  Interview: "Interview",
+  Shortlisted: "Shortlisted",
+  Onboarding: "Onboarding",
+  Hired: "Hired",
+});
+
 // Enumerations for Gender and Marital Status
 const GenderEnum = Object.freeze({
   Female: "female",
@@ -63,6 +71,10 @@ const applicantSchema = new Schema({
   position2: { type: String },
   dateHired2: { type: Date },
   dateResigned2: { type: Date },
+  status: { type: String,
+    enum: Object.values(StatusEnum),
+    default: StatusEnum.Interview, // Set the default status
+  },
 });
 
 // Create and export the "applicants" model

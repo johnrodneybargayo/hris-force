@@ -49,5 +49,28 @@ router.get('/list/:id', async (req, res) => {
   }
 });
 
+router.put('/update-status/:id', async (req, res) => {
+  try {
+    const applicantId = req.params.id; // Get the applicant ID from the URL parameter
+    const { status } = req.body; // Get the new status from the request body
+
+    const updatedApplicant = await ApplicantModel.findByIdAndUpdate(
+      applicantId,
+      { status },
+      { new: true }
+    );
+
+    if (!updatedApplicant) {
+      // If applicant is not found, return a 404 response
+      return res.status(404).json({ error: 'Applicant not found' });
+    }
+
+    res.status(200).json(updatedApplicant); // Respond with the updated applicant data
+  } catch (error) {
+    console.error('Error updating applicant status:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 module.exports = router;
