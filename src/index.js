@@ -10,6 +10,7 @@ const emailRoutes = require("./routes/emailRoutes"); // Import the email routes
 const applicantRoutes = require("./routes/applicantRoutes"); // Import the applicant routes
 const uploadImageRoutes = require("./routes/uploadImage"); // Import the uploadImage routes
 
+
 const path = require("path");
 
 require("dotenv").config();

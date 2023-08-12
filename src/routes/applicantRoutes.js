@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const applicantsController = require('../controllers/applicantsController'); // Import the controllers
 const ApplicantModel = require('../models/Applicant');
 
 // Route to create a new applicant
@@ -72,5 +73,8 @@ router.put('/update-status/:id', async (req, res) => {
   }
 });
 
+// Use the controllers for marking applicants as hired or failed
+router.post('/hired/:id', applicantsController.markApplicantAsHired);
+router.post('/failed/:id', applicantsController.markApplicantAsFailed);
 
 module.exports = router;

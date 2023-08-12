@@ -8,6 +8,7 @@ const StatusEnum = Object.freeze({
   Shortlisted: "Shortlisted",
   Onboarding: "Onboarding",
   Hired: "Hired",
+  Failed: "Failed",
 });
 
 // Enumerations for Gender and Marital Status
