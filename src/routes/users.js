@@ -2,13 +2,15 @@ const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middlewares/authMiddleware');
 const { verifyToken } = require('../helpers/auth');
-const { User, validate } = require('../models/User');
+const { User } = require('../models/User');
+const { validateUserSchema } = require('../models/User'); // Import the schema instead
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 router.post('/', async (req, res) => {
     try {
-        const { error } = validate(req.body);
+        // const { error } = validate(req.body);
+        const { error } = validateUserSchema.validate(req.body); // Use "validateUserSchema" here
         if (error) return res.status(400).send(error.details[0].message);
 
         const user = new User(req.body);

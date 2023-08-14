@@ -77,6 +77,12 @@ const applicantSchema = new Schema({
     default: StatusEnum.Interview, // Set the default status
   },
   positionApplied: {type: String, required: true },
+
+  // createdAt: {
+  //   type: Date,
+  //   default: Date.now,
+  // },
+  
 });
 
 // Create and export the "applicants" model
