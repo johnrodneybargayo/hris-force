@@ -8,6 +8,9 @@ router.post('/create', async (req, res) => {
   try {
     const applicantData = req.body; // The data from the request body
 
+    // Add the createdAt property with the current date and time
+    applicantData.createdAt = new Date();
+
     // Create a new instance of the Applicant model with the applicantData
     const newApplicant = new ApplicantModel(applicantData);
 
@@ -26,7 +29,12 @@ router.get('/list', async (req, res) => {
   try {
     const applicants = await ApplicantModel.find();
 
-    res.status(200).json(applicants); // Respond with the list of applicants
+    const tilesWithCreatedAt = applicants.map(applicant => ({
+      ...applicant.toObject(),
+      createdAt: applicant._id.getTimestamp(), // Add the createdAt timestamp
+    }));
+
+    res.status(200).json(tilesWithCreatedAt); // Respond with the list of applicants
   } catch (error) {
     console.error('Error getting applicants:', error);
     res.status(500).json({ error: 'Internal server error' });
