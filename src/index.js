@@ -38,6 +38,25 @@ app.use(bodyParser.json());
 app.use(cors());
 app.options("*", cors());
 
+const allowedOrigins = [
+  "https://hrsystem-dev.empireonecontactcenter.com",
+  // Add more allowed origins as needed
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+}));
+
 // Serve static files from the 'uploads' directory
 //app.use('/uploads', express.static('uploads'));
 // Assuming 'express' is imported and your app is defined as 'app'
