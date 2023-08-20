@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "empireone-global-inc",
+  "private_key_id": "b59f5dc6818c90bb1d5fab8b51a0c18bc5726d27",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDB3jRyDNnzpnkl\nX5pkfACrj1BfC15oUewwwlL2s5mtFyd8npC/WHIIR1R4LfQCZbyTOJjKQkgcU1K+\nWdIJd0uujkB1qEV0JKvPuwUIpyGFd78fy5F05FBdnmEaNV0w5557wEblLPKypiJB\nIZDIJ/7KBDt94wVGLs3uEgxtBsomisc5pxvmw2/Uyo6AeHkAIbnlgp9dqvmb8C7Y\nQ2KDdc29y7YN0hZOQhiSFvLDDaqaThgF+Y9vHBt1jODgdTrqMqKzrP0QBu8XDNU1\nvcv88PWnRY7VLlqugkckMCN/PBISzhBJ9Qs/g5s6IsQ6l+hF/uuCFdSR0df1rgZS\nxZAEaY/tAgMBAAECggEALKYV0wx1p8E31m0pvCm458oWWwVdxU3UxTgD7nBXnL8f\n53oHYSIoBRMUd6cxstmmcAuRWMeiHu/rtw4tquNwKS/21YIfGMwXS7zJQIBpXnlB\nKbvy8IZioeUHfQc8QradT+ftC/vpm05axkBKPWbErdcCso/113+RCtraRMPTC8P0\nvUVRaqp2z1fhFuclpOHQYMhdk6mp/CFO+FFCNuUl2iH5xt8x0jDTpAGXVdNNaoTJ\nOi2L5TPJee4dafkob6hjjDVSe8KW9kwywm7dl248DRgItHqVirCIZl7m+AEIsvHH\nmlhPWDCgg2HzfXphbfvMdW1MKN3adqiXbTcWjhyQewKBgQDo+caBrwVudbu7q+kS\nLFVNH33g0jitxg9301W7o7dBBEIQMhEkv6uVUGUPMtsSJElXa5oMw5LA1SVDy25V\nboYMds2B+NwmQpoSgXwryRZoEMibmSLxXwCja4/emjVnbx1KpjGnrJh1yh2vSMdk\ngESXgX63pAVnrLCaFaiNqZzkkwKBgQDVBwPLDpr/ldAnbT0SjEQ3M2MVXgeKowhK\npSm37yFXz3IXNgMHVAtz6xRzn1mTgMKIXHPYaXH0D2DvAq61o7Ag0vITQz9UMyn4\nwaUXw4Hj2qcVo70nOeFDiY3nNDd1sjn1tqAStEF5V9wOMgFhespfyU0/IucwW+8z\nGb/fQCkJfwKBgGUZv2MXqKu+u7E9cO9J/dpyCBZAJAiFIsFFHLdI3IWCa4jLsVTZ\nOISbVr+5ugetZ4ZgU4GmfVDhLkK1TTQVumY+SABXFnIkBOhy+Ienw+l1Hxkm41sL\ndyNz0gMvuG0icvuqE3JIHAFBrJAcbSrX3uxAbdUTgKT0885qB7MyH7uxAoGAC7l6\nHPft0flV3oWlodq0enFKl8d4FMpKT4ltlWEE7cdOGTbwzbtzcerTUlXH4VVp34Vv\nHs8W5X7fL+hu4zJiJDxX9HV0C9dRDQ7jXj51bKwBHDDJ3VnTKxtsAvidwM2RYROv\nFbh0DhCm3OUlrE7Myp7SsJHkNYYp0R8ur0PhvlMCgYEAvkxoqFUT4DBwsUwmhNYu\nttmobT6Yc9aGFqimMg761ollnufTBWA3p5WcKWCYa92j+p6FIK8OVm/rVkbPuAR2\nCFi2x5zhXEuWztVuaAKc2n2D5Z6w+RAphY8V5Fw2VKWxC6NhOJDry1OVxMTfdypz\nPZPdK6ainl7F39IxDRI+7Fc=\n-----END PRIVATE KEY-----\n",
+  "client_email": "empireone-global-inc@appspot.gserviceaccount.com",
+  "client_id": "",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/empireone-global-inc%40appspot.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

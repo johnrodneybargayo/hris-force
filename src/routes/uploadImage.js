@@ -3,8 +3,9 @@ const router = express.Router();
 const multer = require('multer');
 const { Storage } = require('@google-cloud/storage');
 const path = require('path');
-const Image = require('../models/Image'); // Import the Image model
 const crypto = require('crypto');
+const Image = require('../models/Image'); // Import the Image model
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 // Create a storage engine for multer to handle file uploads
 const storage = multer.memoryStorage();
@@ -16,7 +17,7 @@ const handleFileUpload = async (req, res, next) => {
       throw new Error('No file uploaded');
     }
 
-    const gcsFileName = `${req.file.fieldname}-${crypto.randomBytes(16).toString('hex')}${path.extname(req.file.originalname)}`;
+    const gcsFileName = `${crypto.randomBytes(16).toString('hex')}${path.extname(req.file.originalname)}`;
 
     // Upload the image to Google Cloud Storage
     const storage = new Storage();
@@ -42,10 +43,14 @@ const handleFileUpload = async (req, res, next) => {
         imageUrl: imageUrl,
       });
 
-      const savedImage = await newImage.save();
-
-      req.savedImage = savedImage;
-      next();
+      try {
+        const savedImage = await newImage.save();
+        req.savedImage = savedImage;
+        next();
+      } catch (saveError) {
+        console.error('Error saving image:', saveError);
+        res.status(500).json({ error: 'An error occurred while saving the image' });
+      }
     });
 
     stream.end(req.file.buffer);
@@ -56,7 +61,7 @@ const handleFileUpload = async (req, res, next) => {
 };
 
 router.post('/', upload.single('image'), handleFileUpload, (req, res) => {
-  res.status(200).json({ imageUrl: req.savedImage.imageUrl });
+  res.status(201).json({ imageUrl: req.savedImage.imageUrl });
 });
 
 module.exports = router;
