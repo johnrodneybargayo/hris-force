@@ -24,6 +24,7 @@ exports.markApplicantAsHired = async (req, res) => {
 
     // Create a user record based on applicant data
     const newUser = new UserModel({
+      profileImage: applicant.imageUrl,
       email: applicant.email,
       password: hashedPassword, // You might want to generate a secure password here
       firstName: applicant.firstName,

@@ -18,6 +18,7 @@ require("dotenv").config();
 const app = express();
 const uri = process.env.MONGO_CONNECTION_STRING;
 const dbName = process.env.MONGODB_DATABASE;
+const googleApplicationCredentials = process.env.GOOGLE_APPLICATION_CREDENTIALS;
 
 mongoose
   .connect(uri, {

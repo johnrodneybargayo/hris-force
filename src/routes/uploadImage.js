@@ -7,9 +7,13 @@ const crypto = require('crypto');
 const Image = require('../models/Image'); // Import the Image model
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 
+// Configure Google Cloud Storage
+const storage = new Storage();
+const bucketName = process.env.BUCKET_NAME || 'hrsystem_bucket1'; // Replace with your bucket name
+
 // Create a storage engine for multer to handle file uploads
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const multerStorage = multer.memoryStorage();
+const upload = multer({ storage: multerStorage });
 
 const handleFileUpload = async (req, res, next) => {
   try {
@@ -18,12 +22,7 @@ const handleFileUpload = async (req, res, next) => {
     }
 
     const gcsFileName = `${crypto.randomBytes(16).toString('hex')}${path.extname(req.file.originalname)}`;
-
-    // Upload the image to Google Cloud Storage
-    const storage = new Storage();
-    const bucketName = 'hrsystem_bucket1'; // Replace with your bucket name
-    const bucket = storage.bucket(bucketName);
-    const blob = bucket.file(gcsFileName);
+    const blob = storage.bucket(bucketName).file(gcsFileName);
 
     const stream = blob.createWriteStream({
       metadata: {
@@ -39,11 +38,8 @@ const handleFileUpload = async (req, res, next) => {
     stream.on('finish', async () => {
       const imageUrl = `https://storage.googleapis.com/${bucketName}/${gcsFileName}`;
 
-      const newImage = new Image({
-        imageUrl: imageUrl,
-      });
-
       try {
+        const newImage = new Image({ imageUrl });
         const savedImage = await newImage.save();
         req.savedImage = savedImage;
         next();

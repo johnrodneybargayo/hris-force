@@ -77,6 +77,7 @@ const applicantSchema = new Schema({
     default: StatusEnum.Interview, // Set the default status
   },
   positionApplied: {type: String, required: true },
+  imageUrl: { type: String, required: true },
 
   createdAt: {
     type: Date,
