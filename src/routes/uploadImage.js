@@ -24,17 +24,20 @@ const handleFileUpload = async (req, res, next) => {
     const gcsFileName = `${crypto.randomBytes(16).toString('hex')}${path.extname(req.file.originalname)}`;
     const blob = storage.bucket(bucketName).file(gcsFileName);
 
+    // Create a write stream for the blob
     const stream = blob.createWriteStream({
       metadata: {
         contentType: req.file.mimetype,
       },
     });
 
+    // Handle stream errors
     stream.on('error', (error) => {
       console.error('Error uploading image to GCS:', error);
       res.status(500).json({ error: 'An error occurred while uploading the image' });
     });
 
+    // Handle stream finish event
     stream.on('finish', async () => {
       const imageUrl = `https://storage.googleapis.com/${bucketName}/${gcsFileName}`;
 
@@ -49,6 +52,7 @@ const handleFileUpload = async (req, res, next) => {
       }
     });
 
+    // Write the file buffer to the stream
     stream.end(req.file.buffer);
   } catch (error) {
     console.error('Error uploading image:', error);

@@ -94,6 +94,14 @@ const userSchema = new Schema({
   },
   positionApplied: { type: String, required: true },
 
+  image: {
+    type: Schema.Types.ObjectId,
+    ref: "Image",
+    required: true,
+  },
+
+  signatureUrl: { type: String },
+
   token: {
     type: String, // or whatever data type is appropriate for storing the token
   },
@@ -130,6 +138,8 @@ const UserModel = mongoose.model("User", userSchema);
 
 // Define the schema for validating user data using Joi
 const validateUserSchema = Joi.object({
+  image: Joi.string(),
+  signatureUrl: Joi.string(),
   email: Joi.string().email().required(),
   password: Joi.string().required(),
   firstName: Joi.string(),

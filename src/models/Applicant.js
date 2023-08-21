@@ -78,14 +78,14 @@ const applicantSchema = new Schema({
   },
   positionApplied: {type: String, required: true },
   
-   // Reference to the image associated with the applicant
-   image: {
-    type: Schema.Types.ObjectId,
-    ref: "Image",
+  image: {
+    type: String,
     required: true,
   },
 
+
   signatureUrl: { type: String },
+
 
   createdAt: {
     type: Date,
