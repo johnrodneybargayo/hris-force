@@ -77,7 +77,15 @@ const applicantSchema = new Schema({
     default: StatusEnum.Interview, // Set the default status
   },
   positionApplied: {type: String, required: true },
-  imageUrl: { type: String, required: true },
+  
+   // Reference to the image associated with the applicant
+   image: {
+    type: Schema.Types.ObjectId,
+    ref: "Image",
+    required: true,
+  },
+
+  signatureUrl: { type: String },
 
   createdAt: {
     type: Date,
