@@ -97,7 +97,6 @@ const userSchema = new Schema({
   image: {
     type: Schema.Types.ObjectId,
     ref: "Image",
-    required: true,
   },
 
   signatureUrl: { type: String },

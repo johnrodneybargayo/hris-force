@@ -79,7 +79,6 @@ const applicantSchema = new Schema({
   
   image: {
     type: String,
-    required: true,
   },
 
 
