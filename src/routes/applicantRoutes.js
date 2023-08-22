@@ -3,10 +3,23 @@ const router = express.Router();
 const applicantsController = require('../controllers/applicantsController'); // Import the controllers
 const ApplicantModel = require('../models/Applicant');
 
-// Route to create a new applicant
+// Route to create a new applicant and check for duplicate entry
 router.post('/create', async (req, res) => {
   try {
     const applicantData = req.body; // The data from the request body
+
+    // Check if an applicant with the same email or mobile number already exists in the database
+    const existingApplicant = await ApplicantModel.findOne({
+      $or: [
+        { email: applicantData.email },
+        { mobileNumber: applicantData.mobileNumber },
+      ],
+    });
+
+    if (existingApplicant) {
+      res.status(400).json({ error: 'Duplicate entry detected' }); // Respond with an error if duplicate entry found
+      return;
+    }
 
     // Add the createdAt property with the current date and time
     applicantData.createdAt = new Date();
