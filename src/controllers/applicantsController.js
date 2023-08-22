@@ -48,8 +48,7 @@ exports.markApplicantAsHired = async (req, res) => {
       yearGraduated: applicant.yearGraduated,
       emergencyName: applicant.emergencyName,
       emergencyContactNumber: applicant.emergencyContactNumber,
-      emergencyAlternateContactNumber:
-        applicant.emergencyAlternateContactNumber,
+      emergencyAlternateContactNumber: applicant.emergencyAlternateContactNumber,
       emergencyRelationship: applicant.emergencyRelationship,
       sssNumber: applicant.sssNumber,
       tinNumber: applicant.tinNumber,

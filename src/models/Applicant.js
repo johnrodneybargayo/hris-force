@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 
 const { Schema } = mongoose;
 
-
 const StatusEnum = Object.freeze({
   Interview: "Interview",
   Shortlisted: "Shortlisted",
@@ -86,12 +85,10 @@ const applicantSchema = new Schema({
 
   signatureUrl: { type: String },
 
-
   createdAt: {
     type: Date,
     default: Date.now,
   },
-  
 });
 
 // Create and export the "applicants" model
