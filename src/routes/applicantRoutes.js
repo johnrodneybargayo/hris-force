@@ -47,6 +47,7 @@ router.get('/list', async (req, res) => {
     const applicantsWithCreatedAt = applicants.map(applicant => ({
       ...applicant.toObject(),
       createdAt: applicant._id.getTimestamp(),
+      signature: applicant.signature, // Include the signature field
     }));
 
     res.status(200).json(applicantsWithCreatedAt);
@@ -65,11 +66,10 @@ router.get('/list/:id', async (req, res) => {
       return res.status(404).json({ error: 'Applicant not found' });
     }
 
-    const signatureData = await SignatureModel.findOne({ applicant: applicantId });
-
-    if (!signatureData) {
-      return res.status(404).json({ error: 'Signature data not found' });
-    }
+    // Simulate fetching signature data
+    const signatureData = {
+      signatureBase64: 'your_signature_base64_data',
+    };
 
     const applicantWithSignature = {
       ...applicant.toObject(),
