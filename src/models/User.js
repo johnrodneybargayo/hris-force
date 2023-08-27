@@ -138,7 +138,6 @@ const UserModel = mongoose.model("User", userSchema);
 // Define the schema for validating user data using Joi
 const validateUserSchema = Joi.object({
   image: Joi.string(),
-  signatureUrl: Joi.string(),
   email: Joi.string().email().required(),
   password: Joi.string().required(),
   firstName: Joi.string(),
@@ -174,6 +173,7 @@ const validateUserSchema = Joi.object({
   dateHired2: Joi.date(),
   dateResigned2: Joi.date(),
   positionApplied: Joi.string(),
+  signature: Joi.string(),
 });
 
 module.exports = { UserModel, validateUserSchema };

@@ -1,4 +1,6 @@
+const { string } = require("joi");
 const mongoose = require("mongoose");
+const SignatureModel = require('../models/signature'); 
 
 const { Schema } = mongoose;
 
@@ -71,18 +73,20 @@ const applicantSchema = new Schema({
   position2: { type: String },
   dateHired2: { type: Date },
   dateResigned2: { type: Date },
-  status: { type: String,
+  status: {
+    type: String,
     enum: Object.values(StatusEnum),
     default: StatusEnum.Interview, // Set the default status
   },
-  positionApplied: {type: String, required: true },
-  
+  positionApplied: { type: String, required: true },
+
   image: {
     type: String,
   },
-
-
-  signatureUrl: { type: String },
+  signature: {
+    type: Schema.Types.ObjectId,
+    ref: 'Signature', // Reference the Signature model
+  },
 
   createdAt: {
     type: Date,

@@ -9,6 +9,8 @@ const inventoryRoutes = require("./routes/inventoryRoutes");
 const emailRoutes = require("./routes/emailRoutes"); // Import the email routes
 const applicantRoutes = require("./routes/applicantRoutes"); // Import the applicant routes
 const uploadImageRoutes = require("./routes/uploadImage"); // Import the uploadImage routes
+const signatureRoutes = require("./routes/signatureRoute"); //Import the SignatureImage outes
+
 
 
 const path = require("path");
@@ -50,6 +52,7 @@ app.use("/api/inventory", inventoryRoutes);
 app.use("/api/emails", emailRoutes); // Add the email routes
 app.use("/api/applicants", applicantRoutes); // Add the applicant routes
 app.use("/api/uploadImage", uploadImageRoutes); // Add the uploadImage routes
+app.use("/api/signature", signatureRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

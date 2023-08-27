@@ -1,53 +1,55 @@
 const express = require('express');
 const router = express.Router();
+const path = require('path'); // Import the 'path' module for file handling
+const fs = require('fs'); // Import the 'fs' module for file operations
+const signatureMiddleware = require('../middlewares/signatureMiddleware'); // Import the middleware
 const applicantsController = require('../controllers/applicantsController'); // Import the controllers
-const ApplicantModel = require('../models/Applicant');
+const SignatureModel = require('../models/signature'); // Make sure the path to the Signature model is correct
+const Applicant = require('../models/Applicant'); // Import the Applicant model
+const { Storage } = require('@google-cloud/storage'); // Import the Storage module
 
-// Route to create a new applicant and check for duplicate entry
+const storage = new Storage();
+const bucketName = process.env.BUCKET_NAME || 'hrsystem_bucket1'; // Replace with your bucket name
+
 router.post('/create', async (req, res) => {
   try {
-    const applicantData = req.body; // The data from the request body
+    const { signatureData, ...applicantData } = req.body;
+    const imageBuffer = Buffer.from(signatureData, 'base64');
 
-    // Check if an applicant with the same email or mobile number already exists in the database
-    const existingApplicant = await ApplicantModel.findOne({
-      $or: [
-        { email: applicantData.email },
-        { mobileNumber: applicantData.mobileNumber },
-      ],
+    const imageName = `${Date.now()}.png`;
+    const file = storage.bucket(bucketName).file(imageName);
+    await file.save(imageBuffer, { contentType: 'image/png' });
+
+    const imageUrl = `https://storage.googleapis.com/${bucketName}/${imageName}`;
+
+    const signature = new SignatureModel({
+      data: imageBuffer,
+      contentType: 'image/png',
+    });
+    await signature.save();
+
+    const applicant = await Applicant.create({
+      ...applicantData,
+      signature: signature._id,
     });
 
-    if (existingApplicant) {
-      res.status(400).json({ error: 'Duplicate entry detected' }); // Respond with an error if duplicate entry found
-      return;
-    }
-
-    // Add the createdAt property with the current date and time
-    applicantData.createdAt = new Date();
-
-    // Create a new instance of the Applicant model with the applicantData
-    const newApplicant = new ApplicantModel(applicantData);
-
-    // Save the new applicant to the database
-    const savedApplicant = await newApplicant.save();
-
-    res.status(201).json(savedApplicant); // Respond with the saved applicant
+    res.status(201).json(applicant);
   } catch (error) {
     console.error('Error creating applicant:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Route to get all applicants
 router.get('/list', async (req, res) => {
   try {
-    const applicants = await ApplicantModel.find();
+    const applicants = await Applicant.find();
 
-    const tilesWithCreatedAt = applicants.map(applicant => ({
+    const applicantsWithCreatedAt = applicants.map(applicant => ({
       ...applicant.toObject(),
-      createdAt: applicant._id.getTimestamp(), // Add the createdAt timestamp
+      createdAt: applicant._id.getTimestamp(),
     }));
 
-    res.status(200).json(tilesWithCreatedAt); // Respond with the list of applicants
+    res.status(200).json(applicantsWithCreatedAt);
   } catch (error) {
     console.error('Error getting applicants:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -56,38 +58,81 @@ router.get('/list', async (req, res) => {
 
 router.get('/list/:id', async (req, res) => {
   try {
-    const applicantId = req.params.id; // Get the applicant ID from the URL parameter
-    const applicant = await ApplicantModel.findById(applicantId);
+    const applicantId = req.params.id;
+    const applicant = await Applicant.findById(applicantId);
 
     if (!applicant) {
-      // If applicant is not found, return a 404 response
       return res.status(404).json({ error: 'Applicant not found' });
     }
 
-    res.status(200).json(applicant); // Respond with the applicant data
+    const signatureData = await SignatureModel.findOne({ applicant: applicantId });
+
+    if (!signatureData) {
+      return res.status(404).json({ error: 'Signature data not found' });
+    }
+
+    const applicantWithSignature = {
+      ...applicant.toObject(),
+      signatureData: signatureData.signatureBase64,
+    };
+
+    res.status(200).json(applicantWithSignature);
   } catch (error) {
     console.error('Error getting applicant:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
+
+router.get('/signature/:id', async (req, res) => {
+  try {
+    const signatureId = req.params.id;
+    // console.log('Requested Signature ID:', signatureId);
+
+    // Fetch the associated signature data based on the signature's ID
+    const signatureData = await SignatureModel.findById(signatureId);
+    // console.log('Retrieved Signature Data:', signatureData);
+
+    if (!signatureData) {
+      return res.status(404).json({ error: 'Signature data not found' });
+    }
+
+    // Add error handling and validation here
+    if (signatureData.data && signatureData.contentType === 'image/png') {
+      const imageBuffer = Buffer.from(signatureData.data.buffer, 'base64');
+
+      // Set appropriate content type in the response
+      res.set('Content-Type', signatureData.contentType);
+
+      // Send the binary image data as the response
+      res.status(200).send(imageBuffer);
+    } else {
+      res.status(404).json({ error: 'Signature data not found or invalid' });
+    }
+  } catch (error) {
+    console.error('Error getting signature data:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
 router.put('/update-status/:id', async (req, res) => {
   try {
-    const applicantId = req.params.id; // Get the applicant ID from the URL parameter
-    const { status } = req.body; // Get the new status from the request body
+    const applicantId = req.params.id;
+    const { status } = req.body;
 
-    const updatedApplicant = await ApplicantModel.findByIdAndUpdate(
+    const updatedApplicant = await Applicant.findByIdAndUpdate(
       applicantId,
       { status },
       { new: true }
     );
 
     if (!updatedApplicant) {
-      // If applicant is not found, return a 404 response
       return res.status(404).json({ error: 'Applicant not found' });
     }
 
-    res.status(200).json(updatedApplicant); // Respond with the updated applicant data
+    res.status(200).json(updatedApplicant);
   } catch (error) {
     console.error('Error updating applicant status:', error);
     res.status(500).json({ error: 'Internal server error' });
