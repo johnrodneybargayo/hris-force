@@ -87,11 +87,11 @@ router.get('/list/:id', async (req, res) => {
 router.get('/signature/:id', async (req, res) => {
   try {
     const signatureId = req.params.id;
-    // console.log('Requested Signature ID:', signatureId);
+    console.log('Requested Signature ID:', signatureId);
 
     // Fetch the associated signature data based on the signature's ID
     const signatureData = await SignatureModel.findById(signatureId);
-    // console.log('Retrieved Signature Data:', signatureData);
+    console.log('Retrieved Signature Data:', signatureData);
 
     if (!signatureData) {
       return res.status(404).json({ error: 'Signature data not found' });
