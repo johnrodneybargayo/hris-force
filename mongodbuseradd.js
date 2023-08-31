@@ -22,7 +22,7 @@ async function insertSampleUserWithRolesAndHashedPassword() {
 
     // Generate a salt and hash the password using bcrypt
     const saltRounds = 10;
-    const plainPassword = 'Password1234'; // Replace with the actual plain password
+    const plainPassword = process.env.DEFAULT_PASSWORD;
     const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
 
     // Insert a sample document with roles and hashed password

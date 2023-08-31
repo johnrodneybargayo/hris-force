@@ -16,7 +16,7 @@ exports.markApplicantAsHired = async (req, res) => {
     }
 
     const saltRounds = 10; // Number of salt rounds for hashing
-    const hashedPassword = await bcrypt.hash("EmpireoneTest123", saltRounds);
+    const hashedPassword = await bcrypt.hash(process.env.DEFAULT_PASSWORD, saltRounds);
 
     // Update applicant status
     applicant.status = "Onboarding";

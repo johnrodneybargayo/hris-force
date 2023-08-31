@@ -19,13 +19,19 @@ router.post('/', async (req, res) => {
         user.password = await bcrypt.hash(user.password, salt);
         await user.save();
 
-        res.send(user);
+        // Instead of sending the user object directly, sanitize the data
+        const sanitizedUser = {
+            _id: user._id,
+            email: user.email,
+            // Add other properties you want to include
+        };
+
+        res.json(sanitizedUser);
     } catch (error) {
         console.log(error);
         res.send('An error occurred');
     }
 });
-
 
 router.get('/me', authMiddleware, async (req, res) => {
     try {

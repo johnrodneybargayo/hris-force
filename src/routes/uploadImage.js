@@ -3,10 +3,11 @@ const router = express.Router();
 const multer = require('multer');
 const { Storage } = require('@google-cloud/storage');
 const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 const crypto = require('crypto');
 const Image = require('../models/Image'); // Import the Image model
 const rateLimit = require('express-rate-limit'); // Import express-rate-limit
-require('dotenv').config({ path: path.join(__dirname, '.env') });
+
 
 // Configure Google Cloud Storage
 const storage = new Storage();

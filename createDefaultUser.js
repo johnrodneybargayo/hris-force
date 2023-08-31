@@ -1,6 +1,7 @@
 const { MongoClient } = require('mongodb');
 const bcrypt = require('bcrypt');
-
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 const uri = process.env.MONGODB_URI; // Use environment variable for MongoDB URI
 const databaseName = 'hrserverless_db'; // Specify the database name separately
 const collectionName = 'users';
@@ -20,7 +21,7 @@ async function createDefaultUser() {
     const defaultUser = createDefaultUserDocument();
 
     // Hash the password using bcrypt
-    const hashedPassword = await hashPassword(process.env.DEFAULT_USER_PASSWORD || generatePassword());
+    const hashedPassword = await hashPassword(process.env.DEFAULT_USER_PASSWORD);
     defaultUser.password = hashedPassword;
 
     // Check if the user already exists
