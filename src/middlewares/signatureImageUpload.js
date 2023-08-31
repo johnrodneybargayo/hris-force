@@ -4,6 +4,7 @@ const { Storage } = require('@google-cloud/storage');
 const path = require('path');
 const crypto = require('crypto');
 const Signature = require('../models/signature');
+const rateLimit = require("express-rate-limit");
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const storage = new Storage();
@@ -15,6 +16,12 @@ const upload = multer({ storage: multerStorage });
 
 // Regular expression for valid image content types
 const validContentTypeRegex = /^image\/(jpeg|png|gif)$/;
+
+// Implement rate limiting middleware
+const signatureUploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 requests per windowMs
+});
 
 const sanitizeContentType = (contentType) => {
   // Validate content type using regular expression
@@ -73,5 +80,6 @@ const handleSignatureImageUpload = async (req, res, next) => {
 
 module.exports = {
   upload,
+  signatureUploadLimiter, // Export the rate limiting middleware
   handleSignatureImageUpload,
 };
