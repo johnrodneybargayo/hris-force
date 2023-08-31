@@ -1,65 +1,56 @@
 const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middlewares/authMiddleware');
-const { verifyToken } = require('../helpers/auth');
-const { User } = require('../models/User');
 const { validateUserSchema } = require('../models/User'); // Import the schema instead
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const { generateAuthToken } = require('../helpers/auth'); // Assuming you have a function to generate tokens
+const { User } = require('../models/User');
 
 router.post('/', async (req, res) => {
-    try {
-        // const { error } = validate(req.body);
-        const { error } = validateUserSchema.validate(req.body); // Use "validateUserSchema" here
-        if (error) return res.status(400).json(error.details[0].message);
-
-        const user = new User(req.body);
-
-        const salt = await bcrypt.genSalt(Number(process.env.SALT));
-        user.password = await bcrypt.hash(user.password, salt);
-        await user.save();
-
-        // Instead of sending the user object directly, sanitize the data
-        const sanitizedUser = {
-            _id: user._id,
-            email: user.email,
-            // Add other properties you want to include
-        };
-
-        res.json(sanitizedUser);
-    } catch (error) {
-        console.log(error);
-        res.send('An error occurred');
+  try {
+    const { error } = validateUserSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
     }
+
+    const existingUser = await User.findOne({ email: req.body.email });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Email already registered' });
+    }
+
+    const user = new User(req.body);
+    const salt = await bcrypt.genSalt(Number(process.env.SALT));
+    user.password = await bcrypt.hash(user.password, salt);
+    await user.save();
+
+    const token = generateAuthToken(user._id); // Generate token for the registered user
+
+    res.json({ user: user.toObject(), token }); // Send user object and token in response
+  } catch (error) {
+    console.error('Error registering user:', error);
+    res.status(500).json({ error: 'An error occurred while registering user' });
+  }
 });
 
 router.get('/me', authMiddleware, async (req, res) => {
-    try {
-        // Access the authenticated user's ID
-        const userId = req.userId;
-
-        // Fetch the user from the database
-        const user = await User.findById(userId).select('-password -__v');
-
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
-        res.json(user);
-    } catch (error) {
-        console.error('Error retrieving user:', error);
-        res.status(500).json({ error: 'An error occurred while retrieving user' });
-    }
-});
-
-// Protected route
-router.get('/protected', authMiddleware, (req, res) => {
-    // The authMiddleware will be called before reaching this handler
-    // If the token is valid, req.userId will be available
+  try {
     const userId = req.userId;
-    // Process the request here
-    res.send('Protected route');
+
+    const user = await User.findById(userId).select('-password -__v');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json(user.toObject()); // Convert to plain object before sending
+  } catch (error) {
+    console.error('Error retrieving user:', error);
+    res.status(500).json({ error: 'An error occurred while retrieving user' });
+  }
 });
 
+router.get('/protected', authMiddleware, (req, res) => {
+  const userId = req.userId;
+  res.json('Protected route');
+});
 
 module.exports = router;
