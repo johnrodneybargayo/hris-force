@@ -24,6 +24,11 @@ async function createDefaultUser() {
     const hashedPassword = await hashPassword(process.env.DEFAULT_USER_PASSWORD);
     defaultUser.password = hashedPassword;
 
+    // Validate email format before querying
+    if (!isValidEmail(defaultUser.email)) {
+      throw new Error('Invalid email format');
+    }
+
     // Check if the user already exists
     const existingUser = await collection.findOne({ email: defaultUser.email });
     if (!existingUser) {
@@ -64,3 +69,12 @@ async function hashPassword(password) {
 async function insertUserDocument(collection, userDocument) {
   return await collection.insertOne(userDocument);
 }
+
+function isValidEmail(email) {
+  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+  return emailRegex.test(email);
+}
+
+module.exports = {
+  createDefaultUser,
+};
