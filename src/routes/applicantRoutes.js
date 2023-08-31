@@ -8,6 +8,7 @@ const SignatureModel = require('../models/signature'); // Make sure the path to 
 const ApplicantModel = require('../models/Applicant'); // Import the Applicant model
 const { Storage } = require('@google-cloud/storage'); // Import the Storage module
 require('dotenv').config({ path: path.join(__dirname, '.env') });
+const sanitizeHtml = require('sanitize-html');
 
 const storage = new Storage();
 const bucketName = process.env.BUCKET_NAME;
@@ -72,9 +73,12 @@ router.get('/list/:id', async (req, res) => {
       signatureBase64: 'your_signature_base64_data',
     };
 
+    // Sanitize the signature data before including it in the response
+    const sanitizedSignature = sanitizeHtml(signatureData.signatureBase64);
+
     const applicantWithSignature = {
       ...applicant.toObject(),
-      signatureData: signatureData.signatureBase64,
+      signatureData: sanitizedSignature,
     };
 
     res.status(200).json(applicantWithSignature);
