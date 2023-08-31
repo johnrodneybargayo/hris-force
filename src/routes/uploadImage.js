@@ -8,15 +8,13 @@ const crypto = require('crypto');
 const Image = require('../models/Image'); // Import the Image model
 const rateLimit = require('express-rate-limit'); // Import express-rate-limit
 
-
 // Configure Google Cloud Storage
 const storage = new Storage();
-const bucketName = process.env.BUCKET_NAME
+const bucketName = process.env.BUCKET_NAME;
 
 // Create a storage engine for multer to handle file uploads
 const multerStorage = multer.memoryStorage();
 const upload = multer({ storage: multerStorage });
-
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -24,7 +22,10 @@ const limiter = rateLimit({
 });
 router.use(limiter); // Apply the limiter to all routes in this router
 
-
+// Sanitize a filename to prevent path traversal
+function sanitizeFilename(filename) {
+  return filename.replace(/[.\/\\]/g, '_');
+}
 
 const handleFileUpload = async (req, res, next) => {
   try {
@@ -32,7 +33,8 @@ const handleFileUpload = async (req, res, next) => {
       throw new Error('No file uploaded');
     }
 
-    const gcsFileName = `${crypto.randomBytes(16).toString('hex')}${path.extname(req.file.originalname)}`;
+    const originalFilename = sanitizeFilename(req.file.originalname);
+    const gcsFileName = `${crypto.randomBytes(16).toString('hex')}${path.extname(originalFilename)}`;
     const blob = storage.bucket(bucketName).file(gcsFileName);
 
     // Create a write stream for the blob
