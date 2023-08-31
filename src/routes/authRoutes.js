@@ -1,18 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const { UserModel } = require('../models/User');
-const { validateLoginSchema } = require('../models/User'); // Import the schema for login validation
+const { validateUserSchema } = require('../models/User'); // Import the schema for login validation
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 // Use environment variables for sensitive information
-const secretKey = process.env.JWT_SECRET;
+const secretKey = process.env.JWT_SECRET_KEY;
+
 
 router.post('/', async (req, res) => {
   try {
-    const { error } = validateLoginSchema.validate(req.body);
+    const { error } = validateUserSchema.validate(req.body);
     if (error) {
       return res.status(400).json({ error: error.details[0].message });
     }
@@ -27,7 +28,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Invalid email or password' });
     }
 
-    const token = jwt.sign({ _id: user._id }, secretKey, { expiresIn: '1h' }); // Include token expiration
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
     user.token = token; // Store the token in the user object
     await user.save(); // Save the user with the updated token
 

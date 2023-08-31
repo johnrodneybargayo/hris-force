@@ -30,7 +30,7 @@ const MaritalStatusEnum = Object.freeze({
   Other: "other",
 });
 
-const secretKey = process.env.JWT_SECRET;
+const secretKey = process.env.JWT_SECRET_KEY;
 
 // Define the user schema
 const userSchema = new Schema({
