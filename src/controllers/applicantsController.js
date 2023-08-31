@@ -85,7 +85,7 @@ exports.markApplicantAsFailed = async (req, res) => {
     const applicantId = req.params.id;
 
     // Find the applicant by ID
-    const applicant = await Applicant.findById(applicantId);
+    const applicant = await ApplicantModel.findById(applicantId);
 
     if (!applicant) {
       return res.status(404).json({ message: "Applicant not found" });
@@ -101,3 +101,9 @@ exports.markApplicantAsFailed = async (req, res) => {
     res.status(500).json({ message: "An error occurred" });
   }
 };
+
+
+
+
+
+

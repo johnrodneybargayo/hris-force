@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const path = require('path'); // Import the 'path' module for file handling
 const fs = require('fs'); // Import the 'fs' module for file operations
-const signatureMiddleware = require('../middlewares/signatureMiddleware'); // Import the middleware
+const signatureMiddleware = require('../middlewares/signatureImageUpload'); // Import the middleware
 const applicantsController = require('../controllers/applicantsController'); // Import the controllers
 const SignatureModel = require('../models/signature'); // Make sure the path to the Signature model is correct
-const Applicant = require('../models/Applicant'); // Import the Applicant model
+const ApplicantModel = require('../models/Applicant'); // Import the Applicant model
 const { Storage } = require('@google-cloud/storage'); // Import the Storage module
 
 const storage = new Storage();
@@ -28,7 +28,7 @@ router.post('/create', async (req, res) => {
     });
     await signature.save();
 
-    const applicant = await Applicant.create({
+    const applicant = await ApplicantModel.create({
       ...applicantData,
       signature: signature._id,
     });
@@ -42,7 +42,7 @@ router.post('/create', async (req, res) => {
 
 router.get('/list', async (req, res) => {
   try {
-    const applicants = await Applicant.find();
+    const applicants = await ApplicantModel.find();
 
     const applicantsWithCreatedAt = applicants.map(applicant => ({
       ...applicant.toObject(),
@@ -60,7 +60,7 @@ router.get('/list', async (req, res) => {
 router.get('/list/:id', async (req, res) => {
   try {
     const applicantId = req.params.id;
-    const applicant = await Applicant.findById(applicantId);
+    const applicant = await ApplicantModel.findById(applicantId);
 
     if (!applicant) {
       return res.status(404).json({ error: 'Applicant not found' });
@@ -122,7 +122,7 @@ router.put('/update-status/:id', async (req, res) => {
     const applicantId = req.params.id;
     const { status } = req.body;
 
-    const updatedApplicant = await Applicant.findByIdAndUpdate(
+    const updatedApplicant = await ApplicantModel.findByIdAndUpdate(
       applicantId,
       { status },
       { new: true }
@@ -142,5 +142,54 @@ router.put('/update-status/:id', async (req, res) => {
 // Use the controllers for marking applicants as hired or failed
 router.post('/hired/:id', applicantsController.markApplicantAsHired);
 router.post('/failed/:id', applicantsController.markApplicantAsFailed);
+router.get('/failed-applicants', async (req, res) => {
+  try {
+    const failedApplicants = await ApplicantModel.find({ status: 'Failed' });
+
+    const applicantsWithSignature = await Promise.all(
+      failedApplicants.map(async (applicant) => {
+        let signature = null;
+
+        if (applicant.signature) {
+          signature = await SignatureModel.findById(applicant.signature);
+        }
+
+        return {
+          ...applicant.toObject(),
+          signature: signature ? signature._id : null,
+        };
+      })
+    );
+
+    res.status(200).json(applicantsWithSignature);
+  } catch (error) {
+    console.error('Error getting failed applicants:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+router.post('/pool/:id', async (req, res) => {
+  try {
+    const applicantId = req.params.id;
+    await ApplicantModel.findByIdAndUpdate(applicantId, { status: StatusEnum.Pooled });
+    res.status(200).json({ message: 'Applicant pooled successfully' });
+  } catch (error) {
+    console.error('Error pooling applicant:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Endpoint to move an applicant to shortlisting with status "interview"
+router.put('/move-to-shortlisting/:id', async (req, res) => {
+  try {
+    const applicantId = req.params.id;
+    await ApplicantModel.findByIdAndUpdate(applicantId, { status: StatusEnum.Shortlisted });
+    res.status(200).json({ message: 'Applicant moved to shortlisting with status "interview"' });
+  } catch (error) {
+    console.error('Error moving applicant to shortlisting:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 module.exports = router;

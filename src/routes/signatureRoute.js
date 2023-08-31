@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const SignatureModel = require('../models/signature'); // Import the correct model
+const { handleSignatureImageUpload } = require('../middlewares/signatureImageUpload'); // Ensure this path is correct
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -35,6 +36,23 @@ router.post('/', upload.single('signature'), async (req, res) => {
   } catch (error) {
     console.error('Error processing signature:', error);
     res.status(500).json({ error: 'An error occurred while processing the signature' });
+  }
+});
+
+// New signature image upload route
+router.post('/image', upload.single('signatureImage'), handleSignatureImageUpload, async (req, res) => {
+  try {
+    if (!req.savedSignature) {
+      return res.status(400).json({ error: 'No signature image uploaded.' });
+    }
+
+    res.status(201).json({
+      signatureId: req.savedSignature._id,
+      imageUrl: req.savedSignature.imageUrl,
+    });
+  } catch (error) {
+    console.error('Error processing signature image:', error);
+    res.status(500).json({ error: 'An error occurred while processing the signature image' });
   }
 });
 
