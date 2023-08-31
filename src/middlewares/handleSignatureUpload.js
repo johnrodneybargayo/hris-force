@@ -2,9 +2,10 @@ const { Storage } = require('@google-cloud/storage');
 const path = require('path');
 const crypto = require('crypto');
 const SignatureImage = require('../models/signature');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const storage = new Storage();
-const bucketName = process.env.BUCKET_NAME || 'hrsystem_bucket1';
+const bucketName = process.env.BUCKET_NAME;
 
 const handleSignatureUpload = async (req, res, next) => {
   try {

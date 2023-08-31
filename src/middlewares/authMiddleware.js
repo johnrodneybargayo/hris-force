@@ -1,5 +1,8 @@
 const jwt = require('jsonwebtoken');
-const secretKey = '431dd5dddcde37181d3816f9e604083693b7fc52873db4a8f2b009d51a23937f'; // Replace with your actual secret key
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+
+const secretKey = process.env.JWT_SECRET;// Replace with your actual secret key
 
 
 const authMiddleware = (req, res, next) => {

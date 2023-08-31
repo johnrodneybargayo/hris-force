@@ -3,11 +3,11 @@ const multer = require('multer');
 const path = require('path');
 const crypto = require('crypto');
 const Signature = require('../models/signature');
-require('dotenv').config(); // To load environment variables
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 // Configure Google Cloud Storage
 const storage = new Storage();
-const bucketName = process.env.BUCKET_NAME || 'hrsystem_bucket1'; // Replace with your bucket name
+const bucketName = process.env.BUCKET_NAME;
 
 const multerStorage = multer.memoryStorage();
 const upload = multer({ storage: multerStorage });

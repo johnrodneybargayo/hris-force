@@ -7,9 +7,10 @@ const applicantsController = require('../controllers/applicantsController'); // 
 const SignatureModel = require('../models/signature'); // Make sure the path to the Signature model is correct
 const ApplicantModel = require('../models/Applicant'); // Import the Applicant model
 const { Storage } = require('@google-cloud/storage'); // Import the Storage module
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const storage = new Storage();
-const bucketName = process.env.BUCKET_NAME || 'hrsystem_bucket1'; // Replace with your bucket name
+const bucketName = process.env.BUCKET_NAME;
 
 router.post('/create', async (req, res) => {
   try {

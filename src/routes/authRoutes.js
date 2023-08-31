@@ -4,9 +4,11 @@ const { UserModel } = require('../models/User');
 const { validateUserSchema } = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 // Use environment variables for sensitive information
-const secretKey = process.env.JWT_SECRET_KEY || '431dd5dddcde37181d3816f9e604083693b7fc52873db4a8f2b009d51a23937f';
+const secretKey = process.env.JWT_SECRET;
 
 router.post('/', async (req, res) => {
   try {
