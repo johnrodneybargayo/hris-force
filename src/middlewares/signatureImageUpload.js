@@ -1,24 +1,31 @@
+const express = require('express');
+const router = express.Router();
 const { Storage } = require('@google-cloud/storage');
-const multer = require('multer');
 const path = require('path');
 const crypto = require('crypto');
 const Signature = require('../models/signature');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 
-const rateLimit = require('express-rate-limit');
-
-// Configure Google Cloud Storage
 const storage = new Storage();
 const bucketName = process.env.BUCKET_NAME;
 
+const multer = require('multer');
 const multerStorage = multer.memoryStorage();
 const upload = multer({ storage: multerStorage });
 
-const signatureUploadLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Limit each IP to 5 requests per windowMs
-  message: { error: 'Too many requests, please try again later.' },
-});
+// Regular expression for valid image content types
+const validContentTypeRegex = /^image\/(jpeg|png|gif)$/;
+
+const sanitizeContentType = (contentType) => {
+  // Validate content type using regular expression
+  if (!validContentTypeRegex.test(contentType)) {
+    // Invalid content type, return a default or handle the error
+    return 'application/octet-stream'; // Default content type
+  }
+
+  // If content type is valid, return the sanitized value
+  return contentType;
+};
 
 const handleSignatureImageUpload = async (req, res, next) => {
   try {
@@ -26,12 +33,15 @@ const handleSignatureImageUpload = async (req, res, next) => {
       throw new Error('No file uploaded');
     }
 
+    // Validate and sanitize the content type
+    const sanitizedContentType = sanitizeContentType(req.file.mimetype);
+
     const gcsFileName = `${crypto.randomBytes(16).toString('hex')}${path.extname(req.file.originalname)}`;
     const blob = storage.bucket(bucketName).file(gcsFileName);
 
     const stream = blob.createWriteStream({
       metadata: {
-        contentType: req.file.mimetype,
+        contentType: sanitizedContentType,
       },
     });
 
@@ -64,5 +74,4 @@ const handleSignatureImageUpload = async (req, res, next) => {
 module.exports = {
   upload,
   handleSignatureImageUpload,
-  signatureUploadLimiter,
 };
