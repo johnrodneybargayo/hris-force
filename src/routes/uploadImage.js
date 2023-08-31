@@ -5,15 +5,25 @@ const { Storage } = require('@google-cloud/storage');
 const path = require('path');
 const crypto = require('crypto');
 const Image = require('../models/Image'); // Import the Image model
+const rateLimit = require('express-rate-limit'); // Import express-rate-limit
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 // Configure Google Cloud Storage
 const storage = new Storage();
-const bucketName = process.env.BUCKET_NAME || 'hrsystem_bucket1'; // Replace with your bucket name
+const bucketName = process.env.BUCKET_NAME
 
 // Create a storage engine for multer to handle file uploads
 const multerStorage = multer.memoryStorage();
 const upload = multer({ storage: multerStorage });
+
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+});
+router.use(limiter); // Apply the limiter to all routes in this router
+
+
 
 const handleFileUpload = async (req, res, next) => {
   try {

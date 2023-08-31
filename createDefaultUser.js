@@ -1,14 +1,14 @@
 const { MongoClient } = require('mongodb');
 const bcrypt = require('bcrypt');
 
-const uri = 'mongodb+srv://empireone:hXCieVuIw5DvCX7z@serverlessinstance1.ey8tlta.mongodb.net'; // Remove the database name from the connection string
+const uri = process.env.MONGODB_URI; // Use environment variable for MongoDB URI
 const databaseName = 'hrserverless_db'; // Specify the database name separately
 const collectionName = 'users';
 
 async function createDefaultUser() {
   try {
     // Connect to MongoDB
-    const client = new MongoClient(process.env.MONGODB_URI, { useUnifiedTopology: true });
+    const client = new MongoClient(uri, { useUnifiedTopology: true });
     await client.connect();
     console.log('Connected to MongoDB');
 
