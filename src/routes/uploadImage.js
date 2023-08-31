@@ -34,7 +34,8 @@ const handleFileUpload = async (req, res, next) => {
     }
 
     const originalFilename = sanitizeFilename(req.file.originalname);
-    const gcsFileName = `${crypto.randomBytes(16).toString('hex')}${path.extname(originalFilename)}`;
+    const uniqueFilename = `${crypto.randomBytes(16).toString('hex')}${path.extname(originalFilename)}`;
+    const gcsFileName = `uploads/${uniqueFilename}`; // Use a specific directory and unique filename
     const blob = storage.bucket(bucketName).file(gcsFileName);
 
     // Create a write stream for the blob
