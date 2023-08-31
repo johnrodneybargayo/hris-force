@@ -7,10 +7,18 @@ require('dotenv').config({ path: path.join(__dirname, '.env') });
 const storage = new Storage();
 const bucketName = process.env.BUCKET_NAME;
 
+const rateLimit = require('express-rate-limit');
+
+const signatureUploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Limit each IP to 10 requests per windowMs
+  message: { error: 'Too many requests, please try again later.' },
+});
+
 const handleSignatureUpload = async (req, res, next) => {
   try {
     if (!req.file) {
-      throw new Error('No file uploaded');
+      return res.status(400).json({ error: 'No file uploaded' });
     }
 
     const gcsFileName = `${crypto.randomBytes(16).toString('hex')}${path.extname(req.file.originalname)}`;
@@ -34,9 +42,11 @@ const handleSignatureUpload = async (req, res, next) => {
         const newSignatureImage = new SignatureImage({ signature: req.file.buffer });
         const savedSignatureImage = await newSignatureImage.save();
 
-        req.savedSignatureImage = savedSignatureImage;
-        req.signatureImageUrl = signatureImageUrl; // Pass the image URL to the next middleware
-        next();
+        res.status(201).json({
+          message: 'Signature image uploaded successfully',
+          signatureImageUrl: signatureImageUrl,
+          savedSignatureImage: savedSignatureImage,
+        });
       } catch (saveError) {
         console.error('Error saving signature image:', saveError);
         res.status(500).json({ error: 'An error occurred while saving the signature image' });
@@ -50,4 +60,7 @@ const handleSignatureUpload = async (req, res, next) => {
   }
 };
 
-module.exports = handleSignatureUpload;
+module.exports = {
+  handleSignatureUpload,
+  signatureUploadLimiter, // Export the rate limiting middleware
+};

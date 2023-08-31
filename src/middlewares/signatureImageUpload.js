@@ -5,12 +5,20 @@ const crypto = require('crypto');
 const Signature = require('../models/signature');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 
+const rateLimit = require('express-rate-limit');
+
 // Configure Google Cloud Storage
 const storage = new Storage();
 const bucketName = process.env.BUCKET_NAME;
 
 const multerStorage = multer.memoryStorage();
 const upload = multer({ storage: multerStorage });
+
+const signatureUploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 requests per windowMs
+  message: { error: 'Too many requests, please try again later.' },
+});
 
 const handleSignatureImageUpload = async (req, res, next) => {
   try {
@@ -56,4 +64,5 @@ const handleSignatureImageUpload = async (req, res, next) => {
 module.exports = {
   upload,
   handleSignatureImageUpload,
+  signatureUploadLimiter,
 };
