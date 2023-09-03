@@ -24,36 +24,28 @@ const handleSignatureUpload = async (req, res, next) => {
     const gcsFileName = `${crypto.randomBytes(16).toString('hex')}${path.extname(req.file.originalname)}`;
     const blob = storage.bucket(bucketName).file(gcsFileName);
 
-    const stream = blob.createWriteStream({
+    // Upload the file buffer directly to Google Cloud Storage
+    await blob.save(req.file.buffer, {
       metadata: {
         contentType: req.file.mimetype,
       },
     });
 
-    stream.on('error', (error) => {
-      console.error('Error uploading signature to GCS:', error);
-      res.status(500).json({ error: 'An error occurred while uploading the signature' });
-    });
+    const signatureImageUrl = `https://storage.googleapis.com/${bucketName}/${gcsFileName}`;
 
-    stream.on('finish', async () => {
-      const signatureImageUrl = `https://storage.googleapis.com/${bucketName}/${gcsFileName}`;
+    try {
+      const newSignatureImage = new SignatureImage({ signature: req.file.buffer });
+      const savedSignatureImage = await newSignatureImage.save();
 
-      try {
-        const newSignatureImage = new SignatureImage({ signature: req.file.buffer });
-        const savedSignatureImage = await newSignatureImage.save();
-
-        res.status(201).json({
-          message: 'Signature image uploaded successfully',
-          signatureImageUrl: signatureImageUrl,
-          savedSignatureImage: savedSignatureImage,
-        });
-      } catch (saveError) {
-        console.error('Error saving signature image:', saveError);
-        res.status(500).json({ error: 'An error occurred while saving the signature image' });
-      }
-    });
-
-    stream.end(req.file.buffer);
+      res.status(201).json({
+        message: 'Signature image uploaded successfully',
+        signatureImageUrl: signatureImageUrl,
+        savedSignatureImage: savedSignatureImage,
+      });
+    } catch (saveError) {
+      console.error('Error saving signature image:', saveError);
+      res.status(500).json({ error: 'An error occurred while saving the signature image' });
+    }
   } catch (error) {
     console.error('Error uploading signature:', error);
     res.status(500).json({ error: 'An error occurred while uploading the signature' });
