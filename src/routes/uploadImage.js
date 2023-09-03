@@ -11,6 +11,7 @@ const rateLimit = require('express-rate-limit'); // Import express-rate-limit
 // Configure Google Cloud Storage
 const storage = new Storage();
 const bucketName = process.env.BUCKET_NAME;
+const bucket = storage.bucket(bucketName);
 
 // Create a storage engine for multer to handle file uploads
 const multerStorage = multer.memoryStorage();
@@ -22,17 +23,9 @@ const limiter = rateLimit({
 });
 router.use(limiter); // Apply the limiter to all routes in this router
 
-// Custom filename normalization and sanitization
+// Sanitize a filename to prevent path traversal
 function sanitizeFilename(filename) {
-  // Remove any potentially dangerous characters or sequences
-  const sanitizedFilename = filename.replace(/[^a-zA-Z0-9_.-]/g, '');
-
-  // Ensure that the filename is not empty after sanitization
-  if (!sanitizedFilename) {
-    throw new Error('Invalid filename');
-  }
-
-  return sanitizedFilename;
+  return path.basename(filename); // Using path.basename to get only the base filename
 }
 
 const handleFileUpload = async (req, res, next) => {
@@ -44,38 +37,21 @@ const handleFileUpload = async (req, res, next) => {
     const originalFilename = sanitizeFilename(req.file.originalname);
     const uniqueFilename = `${crypto.randomBytes(16).toString('hex')}${path.extname(originalFilename)}`;
     const gcsFileName = `uploads/${uniqueFilename}`; // Use a specific directory and unique filename
-    const blob = storage.bucket(bucketName).file(gcsFileName);
+    const blob = bucket.file(gcsFileName);
 
-    // Create a write stream for the blob
-    const stream = blob.createWriteStream({
+    // Upload the file to Google Cloud Storage
+    await blob.save(req.file.buffer, {
       metadata: {
         contentType: req.file.mimetype,
       },
     });
 
-    // Handle stream errors
-    stream.on('error', (error) => {
-      console.error('Error uploading image to GCS:', error);
-      res.status(500).json({ error: 'An error occurred while uploading the image' });
-    });
+    const imageUrl = `https://storage.googleapis.com/${bucketName}/${gcsFileName}`;
 
-    // Handle stream finish event
-    stream.on('finish', async () => {
-      const imageUrl = `https://storage.googleapis.com/${bucketName}/${gcsFileName}`;
-
-      try {
-        const newImage = new Image({ imageUrl });
-        const savedImage = await newImage.save();
-        req.savedImage = savedImage;
-        next();
-      } catch (saveError) {
-        console.error('Error saving image:', saveError);
-        res.status(500).json({ error: 'An error occurred while saving the image' });
-      }
-    });
-
-    // Write the file buffer to the stream
-    stream.end(req.file.buffer);
+    const newImage = new Image({ imageUrl });
+    const savedImage = await newImage.save();
+    req.savedImage = savedImage;
+    next();
   } catch (error) {
     console.error('Error uploading image:', error);
     res.status(500).json({ error: 'An error occurred while uploading the image' });
