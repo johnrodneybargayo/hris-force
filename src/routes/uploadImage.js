@@ -22,10 +22,16 @@ const limiter = rateLimit({
 });
 router.use(limiter); // Apply the limiter to all routes in this router
 
-// Sanitize a filename to prevent path traversal
+// Custom filename normalization and sanitization
 function sanitizeFilename(filename) {
-  // Using path.basename to get only the base filename
-  return path.basename(filename);
+  // Get the extension from the original filename
+  const fileExtension = path.extname(filename);
+
+  // Remove special characters, spaces, and other unwanted characters
+  const sanitizedFilename = filename.replace(/[^a-zA-Z0-9_.-]/g, '');
+
+  // Combine the sanitized filename with the original extension
+  return sanitizedFilename + fileExtension;
 }
 
 const handleFileUpload = async (req, res, next) => {
