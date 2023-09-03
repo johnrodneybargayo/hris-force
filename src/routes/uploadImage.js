@@ -24,7 +24,8 @@ router.use(limiter); // Apply the limiter to all routes in this router
 
 // Sanitize a filename to prevent path traversal
 function sanitizeFilename(filename) {
-  return path.basename(filename); // Using path.basename to get only the base filename
+  // Using path.basename to get only the base filename
+  return path.basename(filename);
 }
 
 const handleFileUpload = async (req, res, next) => {
