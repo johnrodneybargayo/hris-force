@@ -102,8 +102,30 @@ const userSchema = new Schema({
 
   signatureUrl: { type: String },
 
+  notes: [
+    {
+      text: String,
+      applicant: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Applicant",
+      },
+      timestamp: Date,
+      status: String,
+    },
+  ],
+
   token: {
     type: String, // or whatever data type is appropriate for storing the token
+  },
+
+  // New fields for admin and authentication
+  isAdmin: {
+    type: Boolean,
+    default: false, // Set to false by default
+  },
+  isAuthenticated: {
+    type: Boolean,
+    default: false, // Set to false by default
   },
 
   createdAt: {
@@ -175,6 +197,8 @@ const validateUserSchema = Joi.object({
   dateResigned2: Joi.date(),
   positionApplied: Joi.string(),
   signature: Joi.string(),
+  isAdmin: Joi.boolean().default(false), // Validates that isAdmin is a boolean, defaulting to false if not provided
+  isAuthenticated: Joi.boolean().default(false), // Validates that isAuthenticated is a boolean, defaulting to false if not provided
 });
 
 module.exports = { UserModel, validateUserSchema };

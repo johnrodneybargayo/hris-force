@@ -58,7 +58,7 @@ app.use("/api/uploadImage", uploadImageRoutes); // Add the uploadImage routes
 app.use("/api/signature", signatureRoutes);
 app.use("/api/signature/image", signatureRoutes);
 app.use('/api/statusCounts', countRoutes);
-app.use('/api/notes', notesRoutes);
+app.use('/api/notes', notesRoutes); 
 
 
 // Error handling middleware

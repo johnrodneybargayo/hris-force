@@ -88,7 +88,17 @@ const applicantSchema = new Schema({
     ref: 'Signature', // Reference the Signature model
   },
 
-  // notes: [{ type: Schema.Types.ObjectId, ref: "Note" }],
+  notes: [
+    {
+      text: String,
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      timestamp: Date,
+      status: String,
+    },
+  ],
 
   createdAt: {
     type: Date,
