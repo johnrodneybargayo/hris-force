@@ -11,7 +11,8 @@ const applicantRoutes = require("./routes/applicantRoutes"); // Import the appli
 const uploadImageRoutes = require("./routes/uploadImage"); // Import the uploadImage routes
 const signatureRoutes = require("./routes/signatureRoute"); //Import the SignatureImage Routes
 const countRoutes = require('./routes/countRoutes'); //Import the countRoutes Routes
-const notesRoutes = require('./routes/notesRoutes');
+const notesRoutes = require('./routes/notesRoutes'); // Make sure the path is correct
+
 
 
 
@@ -58,6 +59,7 @@ app.use("/api/signature", signatureRoutes);
 app.use("/api/signature/image", signatureRoutes);
 app.use('/api/statusCounts', countRoutes);
 app.use('/api/notes', notesRoutes);
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {

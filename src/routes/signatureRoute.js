@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const SignatureModel = require('../models/signature'); // Import the correct model
-const { handleSignatureImageUpload } = require('../middlewares/signatureImageUpload'); // Ensure this path is correct
+const SignatureModel = require('../models/signature');
+const { handleSignatureImageUpload } = require('../middlewares/signatureImageUpload');
 
+// Configure multer storage and limits
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
@@ -11,7 +12,8 @@ const upload = multer({
   },
 });
 
-router.post('/', upload.single('signature'), async (req, res) => {
+// Handle regular signature uploads
+router.post('/', upload.single('signature'), async (req, res ) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded.' });
@@ -38,8 +40,7 @@ router.post('/', upload.single('signature'), async (req, res) => {
     res.status(500).json({ error: 'An error occurred while processing the signature' });
   }
 });
-
-// New signature image upload route
+// Handle image signature uploads
 router.post('/image', upload.single('signatureImage'), handleSignatureImageUpload, async (req, res) => {
   try {
     if (!req.savedSignature) {

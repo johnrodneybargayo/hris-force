@@ -1,4 +1,5 @@
 const { Storage } = require('@google-cloud/storage');
+const { promisify } = require('util');
 const path = require('path');
 const crypto = require('crypto');
 const SignatureImage = require('../models/signature');
@@ -6,6 +7,8 @@ require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const storage = new Storage();
 const bucketName = process.env.BUCKET_NAME;
+const bucket = storage.bucket(bucketName);
+const blob = promisify(bucket.file.bind(bucket));
 
 const rateLimit = require('express-rate-limit');
 
@@ -22,10 +25,10 @@ const handleSignatureUpload = async (req, res, next) => {
     }
 
     const gcsFileName = `${crypto.randomBytes(16).toString('hex')}${path.extname(req.file.originalname)}`;
-    const blob = storage.bucket(bucketName).file(gcsFileName);
+    const file = bucket.file(gcsFileName);
 
     // Upload the file buffer directly to Google Cloud Storage
-    await blob.save(req.file.buffer, {
+    await file.save(req.file.buffer, {
       metadata: {
         contentType: req.file.mimetype,
       },

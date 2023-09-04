@@ -15,10 +15,13 @@ const bucketName = process.env.BUCKET_NAME;
 
 router.post('/create', async (req, res) => {
   try {
+    console.log('Received POST request to create applicant.');
+
     const { signatureData, ...applicantData } = req.body;
     const imageBuffer = Buffer.from(signatureData, 'base64');
 
     const imageName = `${Date.now()}.png`;
+    console.log(`Saving image as ${imageName}`);
     const file = storage.bucket(bucketName).file(imageName);
     await file.save(imageBuffer, { contentType: 'image/png' });
 
@@ -28,19 +31,23 @@ router.post('/create', async (req, res) => {
       data: imageBuffer,
       contentType: 'image/png',
     });
+    console.log('Saving signature data to the database.');
     await signature.save();
 
+    console.log('Creating applicant in the database.');
     const applicant = await ApplicantModel.create({
       ...applicantData,
       signature: signature._id,
     });
 
+    console.log('Applicant created successfully.');
     res.status(201).json(applicant);
   } catch (error) {
     console.error('Error creating applicant:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 router.get('/list', async (req, res) => {
   try {
@@ -102,15 +109,15 @@ router.get('/signature/:id', async (req, res) => {
       return res.status(404).json({ error: 'Signature data not found' });
     }
 
-    // Add error handling and validation here
-    if (signatureData.data && signatureData.contentType === 'image/png') {
-      const imageBuffer = Buffer.from(signatureData.data.buffer, 'base64');
+    // Ensure the signatureData has binary data and contentType property
+    if (signatureData.data && signatureData.contentType) {
+      const imageBuffer = Buffer.from(signatureData.data, 'base64');
 
       // Set appropriate content type in the response
       res.set('Content-Type', signatureData.contentType);
 
       // Send the binary image data as the response
-      res.status(200).json(imageBuffer);
+      res.status(200).send(imageBuffer);
     } else {
       res.status(404).json({ error: 'Signature data not found or invalid' });
     }

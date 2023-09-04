@@ -88,6 +88,8 @@ const applicantSchema = new Schema({
     ref: 'Signature', // Reference the Signature model
   },
 
+  // notes: [{ type: Schema.Types.ObjectId, ref: "Note" }],
+
   createdAt: {
     type: Date,
     default: Date.now,
