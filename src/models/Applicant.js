@@ -88,23 +88,30 @@ const applicantSchema = new Schema({
     ref: 'Signature', // Reference the Signature model
   },
 
-  notes: [
-    {
-      text: String,
-      user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-      timestamp: Date,
-      status: String,
-    },
-  ],
+// New fields for notes
+notesSummary: [
+  {
+    text: String,
+    timestamp: Date,
+    status: String,
+  },
+],
+notes: [
+  {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Note',
+  },
+],
 
   createdAt: {
     type: Date,
     default: Date.now,
   },
 });
+
+applicantSchema.statics.findById = function (applicantId) {
+  return this.findOne({ _id: applicantId });
+};
 
 // Create and export the "applicants" model
 const ApplicantModel = mongoose.model("applicants", applicantSchema);

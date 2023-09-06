@@ -102,18 +102,6 @@ const userSchema = new Schema({
 
   signatureUrl: { type: String },
 
-  notes: [
-    {
-      text: String,
-      applicant: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Applicant",
-      },
-      timestamp: Date,
-      status: String,
-    },
-  ],
-
   token: {
     type: String, // or whatever data type is appropriate for storing the token
   },
@@ -139,6 +127,12 @@ userSchema.virtual("fullName").get(function () {
   return `${this.firstName} ${this.lastName}`;
 });
 
+// Static method to find a user by ID
+userSchema.statics.findById = function (userId) {
+  return this.findOne({ _id: userId });
+};
+
+
 // Static method to find a user by email
 userSchema.statics.findByEmail = function (email) {
   return this.findOne({ email });
@@ -149,11 +143,7 @@ userSchema.methods.comparePassword = function (password) {
   return bcrypt.compareSync(password, this.password);
 };
 
-// Method to generate an authentication token for the user
-userSchema.methods.generateAuthToken = function () {
-  const token = jwt.sign({ _id: this._id }, secretKey);
-  return token;
-};
+
 
 // Create the UserModel using the user schema
 const UserModel = mongoose.model("User", userSchema);
