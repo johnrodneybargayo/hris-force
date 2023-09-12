@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path'); // Import the 'path' module for file handling
-const fs = require('fs'); // Import the 'fs' module for file operations
+const fs = require('fs'); // Import the 'fs' module for fisle operations
 const signatureMiddleware = require('../middlewares/signatureImageUpload'); // Import the middleware
 const applicantsController = require('../controllers/applicantsController'); // Import the controllers
 const SignatureModel = require('../models/signature'); // Make sure the path to the Signature model is correct
 const ApplicantModel = require('../models/Applicant'); // Import the Applicant model
+const notesController = require('../controllers/notesController');
 const { Storage } = require('@google-cloud/storage'); // Import the Storage module
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 const sanitizeHtml = require('sanitize-html');
@@ -204,4 +205,34 @@ router.put('/move-to-shortlisting/:id', async (req, res) => {
   }
 });
 
+// Create a new note for an applicant
+router.post('/:applicantId/notes', async (req, res) => {
+  const { content, status } = req.body;
+  const applicantId = req.params.applicantId;
+
+  try {
+    if (!content || !status) {
+      return res.status(400).json({ error: 'Content and status are required fields' });
+    }
+
+    const note = await notesController.createNoteForApplicant(applicantId, content, status);
+    res.status(201).json(note);
+  } catch (error) {
+    console.error('Error creating note:', error);
+    res.status(500).json({ error: 'An error occurred while creating the note' });
+  }
+});
+
+// Get all notes for an applicant
+router.get('/:applicantId/notes', async (req, res) => {
+  const applicantId = req.params.applicantId;
+
+  try {
+    const notes = await notesController.getAllNotesForApplicant(applicantId);
+    res.json(notes);
+  } catch (error) {
+    console.error('Error fetching notes:', error);
+    res.status(500).json({ error: 'An error occurred while fetching notes' });
+  }
+});
 module.exports = router;

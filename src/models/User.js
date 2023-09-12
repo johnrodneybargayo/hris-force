@@ -102,9 +102,14 @@ const userSchema = new Schema({
 
   signatureUrl: { type: String },
 
-  token: {
-    type: String, // or whatever data type is appropriate for storing the token
-  },
+  tokens: [
+    {
+      token: {
+        type: String,
+        required: true,
+      },
+    },
+  ],
 
   // New fields for admin and authentication
   isAdmin: {
@@ -128,7 +133,7 @@ userSchema.virtual("fullName").get(function () {
 });
 
 // Static method to find a user by ID
-userSchema.statics.findById = function (userId) {
+userSchema.statics.findUserById = function (userId) {
   return this.findOne({ _id: userId });
 };
 
@@ -143,10 +148,16 @@ userSchema.methods.comparePassword = function (password) {
   return bcrypt.compareSync(password, this.password);
 };
 
-
+// Method to generate an authentication token
+userSchema.methods.generateAuthToken = function () {
+  const token = jwt.sign({ _id: this._id.toString() }, secretKey);
+  this.tokens = this.tokens.concat({ token });
+  return token;
+};
 
 // Create the UserModel using the user schema
 const UserModel = mongoose.model("User", userSchema);
+
 
 // Define the schema for validating user data using Joi
 const validateUserSchema = Joi.object({

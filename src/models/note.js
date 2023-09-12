@@ -1,17 +1,27 @@
 const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
-const noteSchema = new mongoose.Schema({
-  text: String,
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+const noteSchema = new Schema({
+  content: {
+    type: String,
+    required: true,
   },
-  timestamp: Date,
-  status: String,
+  applicantId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Applicant', // Reference the User model
+    required: true,
+  },
+  status: {
+    type: String,
+    required: true,
+    enum: ['Failed', 'Endorsed for Final Interview', 'For Exam Retake', 'Endorsed for Director/CEO Interview', 'For Reserved', 'Passed'],
+  },
+  timestamp: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
-const Note = mongoose.model('Note', noteSchema);
+const NoteModel = mongoose.model('Note', noteSchema);
 
-module.exports = {
-  Note,
-};
+module.exports = NoteModel;

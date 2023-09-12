@@ -66,24 +66,19 @@ router.post('/logout', async (req, res) => {
       return res.status(401).json({ message: 'Authorization header missing' });
     }
 
-    // Verify the token
-    jwt.verify(token, secretKey, async (err, decoded) => {
-      if (err) {
-        return res.status(401).json({ message: 'Invalid token' });
-      }
+    // Verify the token synchronously
+    const decoded = jwt.verify(token, secretKey);
 
-      // Blacklist the token (optional step)
-      // You can implement a token blacklist to prevent the token from being used again
+    // Blacklist the token (optional step)
+    // You can implement a token blacklist to prevent the token from being used again
 
-      // Perform any other necessary cleanup or logging
+    // Perform any other necessary cleanup or logging
 
-      // Return a success message
-      return res.status(200).json({ message: 'Logout successful' });
-    });
+    // Return a success message
+    return res.status(200).json({ message: 'Logout successful' });
   } catch (error) {
     console.error('Error occurred during logout:', error);
     res.status(500).json({ error: 'An error occurred during logout' });
   }
 });
-
 module.exports = router;

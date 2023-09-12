@@ -1,6 +1,6 @@
 const { string } = require("joi");
 const mongoose = require("mongoose");
-const SignatureModel = require('../models/signature'); 
+const SignatureModel = require("../models/signature");
 
 const { Schema } = mongoose;
 
@@ -85,24 +85,16 @@ const applicantSchema = new Schema({
   },
   signature: {
     type: Schema.Types.ObjectId,
-    ref: 'Signature', // Reference the Signature model
+    ref: "Signature", // Reference the Signature model
   },
 
-// New fields for notes
-notesSummary: [
-  {
-    text: String,
-    timestamp: Date,
-    status: String,
-  },
-],
-notes: [
-  {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Note',
-  },
-],
-
+  notes: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Note', // Reference the Note model
+    },
+  ],
+  
   createdAt: {
     type: Date,
     default: Date.now,

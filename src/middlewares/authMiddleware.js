@@ -1,4 +1,6 @@
 const jwt = require('jsonwebtoken');
+const { UserModel } = require('../models/User');
+const { ApplicantModel } = require('../models/Applicant');
 require('dotenv').config();
 
 const secretKey = process.env.JWT_SECRET_KEY;
@@ -10,23 +12,40 @@ const authMiddleware = async (req, res, next) => {
     return res.status(401).json({ message: 'Authorization header missing' });
   }
 
-  jwt.verify(token, secretKey, async (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ message: 'Invalid token' });
+  try {
+    const decoded = jwt.verify(token.replace('Bearer ', ''), secretKey);
+
+    const userId = decoded._id;
+
+    // Determine the context of the request and choose the appropriate model
+    let user;
+
+    if (req.baseUrl === '/api/users') {
+      user = await UserModel.findById(userId);
+    } else if (req.baseUrl === '/api/applicants') {
+      user = await ApplicantModel.findById(userId); // Use userId instead of ApplicantId
     }
 
-    const userId = decoded.userId;
+    if (!user) {
+      return res.status(401).json({ message: 'User not found' });
+    }
 
-    // Check if the user exists and is authenticated
-    const user = await UserModel.findById(userId);
-
-    if (!user || !user.isAuthenticated) {
+    // Optionally, you can check if the user is authenticated using a flag or property
+    if (!user.isAuthenticated) {
       return res.status(401).json({ message: 'User not authenticated' });
     }
 
-    req.userId = userId;
+    req.user = user; // Assign the user object to req.user
     next();
-  });
+  } catch (error) {
+    console.error('Authentication error:', error);
+
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: 'Token has expired' });
+    }
+
+    return res.status(401).json({ message: 'Invalid token' });
+  }
 };
 
 module.exports = authMiddleware;
