@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const notesController = require('../controllers/notesController');
 const authMiddleware = require('../middlewares/authMiddleware')
+const noteTokenUtils = require('../helpers/tokenUtils');
 
 router.post('/:applicantId', async (req, res) => {
   const { content, status } = req.body;

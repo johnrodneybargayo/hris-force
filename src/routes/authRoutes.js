@@ -38,20 +38,35 @@ router.post('/', validateLogin, async (req, res) => {
       return res.status(400).json({ error: 'Invalid email or password' });
     }
 
-    // Generate a JWT token for the user using the createAccessToken function
-    const token = createAccessToken(user._id, user.isAdmin);
+    // Check if the user is already authenticated
+    if (user.isAuthenticated) {
+      console.log('User is already authenticated');
+    } else {
+      // Generate a JWT token for the user with firstName and lastName included
+      const tokenPayload = {
+        _id: user._id,
+        isAdmin: user.isAdmin,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      };
 
-    // Store the token in the user object and save it
-    user.token = token;
-    await user.save();
+      const token = createAccessToken(tokenPayload);
+
+      // Store the token in the user object and set isAuthenticated to true
+      user.token = token;
+      user.isAuthenticated = true;
+
+      await user.save();
+    }
 
     console.log('User logged in successfully');
-    res.json({ token }); // Return the token in the response
+    res.json({ token: user.token, firstName: user.firstName, lastName: user.lastName }); // Include firstName and lastName in the response
   } catch (error) {
     console.error('Error occurred during login:', error);
     res.status(500).json({ error: 'An error occurred during login' });
   }
 });
+
 
 router.get('/protected', authenticateUser, (req, res) => {
   res.json({ message: 'This is a protected route' });

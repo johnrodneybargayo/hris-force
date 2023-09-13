@@ -2,10 +2,10 @@ const NoteModel = require("../models/note");
 const UserModel = require("../models/User"); // Import the User model
 
 const notesController = {
-  createNote: async (content, status, applicantId) => {
+  createNote: async (content, status, applicantId, userId) => {
     try {
       // Create a new note instance
-      const newNote = new NoteModel({ content, status, applicantId });
+      const newNote = new NoteModel({ content, status, applicantId, });
 
       // Save the new note to the database
       await newNote.save();
@@ -20,7 +20,7 @@ const notesController = {
   getAllNotesForUser: async (userId) => {
     try {
       // Find all notes for the specified user
-      const notes = await NoteModel.find({ applicantId: userId });
+      const notes = await NoteModel.find({ applicantId, userId });
   
       return notes;
     } catch (error) {

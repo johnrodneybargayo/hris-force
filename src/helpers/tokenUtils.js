@@ -2,9 +2,9 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const secretKey = process.env.JWT_SECRET_KEY;
-const tokenExpiration = process.env.JWT_TOKEN_EXPIRATION || '15m';
+const tokenExpiration = process.env.JWT_TOKEN_EXPIRATION || '1h';
 
-const createAccessToken = (userId, isAdmin) => {
+function createAccessToken(userId, isAdmin) {
   const payload = {
     userId,
     isAdmin,
@@ -16,8 +16,23 @@ const createAccessToken = (userId, isAdmin) => {
 
   const token = jwt.sign(payload, secretKey, options);
   return token;
-};
+}
+
+function createNoteAccessToken(payload) {
+  return jwt.sign(payload, secretKey, { expiresIn: tokenExpiration });
+}
+
+function verifyNoteAccessToken(token) {
+  try {
+    const decoded = jwt.verify(token, secretKey);
+    return decoded;
+  } catch (error) {
+    return null; // Token is invalid
+  }
+}
 
 module.exports = {
   createAccessToken,
+  createNoteAccessToken,
+  verifyNoteAccessToken,
 };

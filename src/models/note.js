@@ -1,19 +1,23 @@
 const mongoose = require('mongoose');
-const { Schema } = mongoose;
 
-const noteSchema = new Schema({
+const noteSchema = new mongoose.Schema({
   content: {
     type: String,
-    required: true,
+
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+
   },
   applicantId: {
-    type: Schema.Types.ObjectId,
-    ref: 'Applicant', // Reference the User model
-    required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Applicant',
+
   },
   status: {
     type: String,
-    required: true,
+
     enum: ['Failed', 'Endorsed for Final Interview', 'For Exam Retake', 'Endorsed for Director/CEO Interview', 'For Reserved', 'Passed'],
   },
   timestamp: {

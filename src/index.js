@@ -13,6 +13,7 @@ const uploadImageRoutes = require("./routes/uploadImage"); // Import the uploadI
 const signatureRoutes = require("./routes/signatureRoute"); // Import the SignatureImage Routes
 const countRoutes = require('./routes/countRoutes'); // Import the countRoutes Routes
 const notesRoutes = require('./routes/notesRoutes'); // Make sure the path is correct
+const registration = require('./routes/registration');
 
 const path = require("path");
 
@@ -42,6 +43,7 @@ app.use(helmet()); // Use Helmet for security
 app.use(bodyParser.json());
 app.use(cors());
 app.options("*", cors());
+app.use(express.json());
 
 // Serve static files from the 'uploads' directory
 //app.use('/uploads', express.static('uploads'));
@@ -50,6 +52,7 @@ app.options("*", cors());
 // Routes
 app.use("/api/users", users);
 app.use("/api/login", authRoutes);
+app.use("/api/register", registration);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/emails", emailRoutes); // Add the email routes
 app.use("/api/applicants", applicantRoutes); // Add the applicant routes
