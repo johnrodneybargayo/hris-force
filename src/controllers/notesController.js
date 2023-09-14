@@ -5,7 +5,7 @@ const notesController = {
   createNote: async (content, status, applicantId, userId) => {
     try {
       // Create a new note instance
-      const newNote = new NoteModel({ content, status, applicantId, });
+      const newNote = new NoteModel({ content, status, applicantId, userId});
 
       // Save the new note to the database
       await newNote.save();
@@ -17,17 +17,19 @@ const notesController = {
     }
   },
 
-  getAllNotesForUser: async (userId) => {
+  getAllNotesForUser: async (applicantId, userId) => {
     try {
       // Find all notes for the specified user
-      const notes = await NoteModel.find({ applicantId, userId });
-  
+      const notes = await NoteModel.find({ applicantId, userId }); // Use userId instead of findById
+    
       return notes;
     } catch (error) {
       console.error("Error retrieving notes:", error);
       throw error;
     }
   },
+  
+  
   
   
   updateNoteById: async (req, res) => {
