@@ -118,7 +118,7 @@ router.get('/signature/:id', async (req, res) => {
       res.set('Content-Type', signatureData.contentType);
 
       // Send the binary image data as the response
-      res.status(200).send(imageBuffer);
+      res.status(200).json(imageBuffer);
     } else {
       res.status(404).json({ error: 'Signature data not found or invalid' });
     }
