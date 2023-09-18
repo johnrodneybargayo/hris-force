@@ -2,38 +2,44 @@ const express = require('express');
 const router = express.Router();
 const notesController = require('../controllers/notesController');
 const authMiddleware = require('../middlewares/authMiddleware')
-const noteTokenUtils = require('../helpers/tokenUtils');
 
-router.post('/:applicantId', async (req, res) => {
+router.post('/:applicantId', authMiddleware, async (req, res) => {
   const { content, status } = req.body;
   const applicantId = req.params.applicantId;
+  const createdByUserId = req.user._id; // Use the ID of the logged-in user
 
   try {
     if (!content || !status) {
       return res.status(400).json({ error: 'Content and status are required fields' });
     }
 
-    // Call the controller method to create a note for the user
-    const note = await notesController.createNote(content, status, applicantId);
+    // Call the controller method to create a note for the applicant
+    const note = await notesController.createNoteForApplicantWithUserId(
+      applicantId,
+      content,
+      status,
+      createdByUserId
+    ); // Pass createdByUserId
+
     res.status(201).json(note);
   } catch (error) {
-    console.error('Error creating note:', error);
-    res.status(500).json({ error: 'An error occurred while creating the note' });
+    console.error('Error creating note for applicant:', error);
+    res.status(500).json({ error: 'An error occurred while creating the note for the applicant' });
   }
 });
 
 // Get all notes for a user
-router.get('/:applicantId', async (req, res) => {
-  const userId = req.params.applicantId;
-
+// Modify your server route to fetch notes from all users
+router.get('/applicantId', async (req, res) => {
   try {
-    const notes = await notesController.getAllNotesForUser(userId);
+    const notes = await notesController.getAllNotes(); // Implement this function to get notes from all users
     res.json(notes);
   } catch (error) {
     console.error('Error fetching notes:', error);
     res.status(500).json({ error: 'An error occurred while fetching notes' });
   }
 });
+
 
 
 // Get a specific note by ID

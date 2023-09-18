@@ -4,16 +4,13 @@ const { UserModel } = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
-const path = require('path');
-const { createAccessToken } = require('../helpers/tokenUtils'); // Import the createAccessToken function
-const authenticateUser = require('../middlewares/authMiddleware'); // Import the authentication middleware
+const { createAccessToken } = require('../helpers/tokenUtils');
+const authenticateUser = require('../middlewares/authMiddleware');
 require('dotenv').config();
 
-// Use environment variables for sensitive information
 const secretKey = process.env.JWT_SECRET_KEY;
-const tokenExpiration = process.env.JWT_TOKEN_EXPIRATION || '1h'; // Token expiration time, default to 1 hour
+const tokenExpiration = process.env.JWT_TOKEN_EXPIRATION || '1h';
 
-// Request validation using express-validator
 const validateLogin = [
   body('email').isEmail().normalizeEmail(),
   body('password').notEmpty(),
@@ -21,7 +18,6 @@ const validateLogin = [
 
 router.post('/', validateLogin, async (req, res) => {
   try {
-    // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       console.log('Validation errors:', errors.array());
@@ -30,7 +26,6 @@ router.post('/', validateLogin, async (req, res) => {
 
     const { email, password } = req.body;
 
-    // Find the user by email
     const user = await UserModel.findOne({ email });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -38,11 +33,9 @@ router.post('/', validateLogin, async (req, res) => {
       return res.status(400).json({ error: 'Invalid email or password' });
     }
 
-    // Check if the user is already authenticated
     if (user.isAuthenticated) {
       console.log('User is already authenticated');
     } else {
-      // Generate a JWT token for the user with firstName and lastName included
       const tokenPayload = {
         _id: user._id,
         isAdmin: user.isAdmin,
@@ -52,7 +45,6 @@ router.post('/', validateLogin, async (req, res) => {
 
       const token = createAccessToken(tokenPayload);
 
-      // Store the token in the user object and set isAuthenticated to true
       user.token = token;
       user.isAuthenticated = true;
 
@@ -60,40 +52,43 @@ router.post('/', validateLogin, async (req, res) => {
     }
 
     console.log('User logged in successfully');
-    res.json({ token: user.token, firstName: user.firstName, lastName: user.lastName }); // Include firstName and lastName in the response
+    res.json({ token: user.token, firstName: user.firstName, lastName: user.lastName });
   } catch (error) {
     console.error('Error occurred during login:', error);
     res.status(500).json({ error: 'An error occurred during login' });
   }
 });
 
-
 router.get('/protected', authenticateUser, (req, res) => {
   res.json({ message: 'This is a protected route' });
 });
 
-router.post('/logout', async (req, res) => {
+router.post('/logout', authenticateUser, async (req, res) => {
   try {
-    // Assuming you're sending the token in the request headers
-    const token = req.headers.authorization;
+    const user = req.authUser;
 
-    if (!token) {
-      return res.status(401).json({ message: 'Authorization header missing' });
-    }
+    // Update the user's isAuthenticated status to false
+    user.isAuthenticated = false;
 
-    // Verify the token synchronously
-    const decoded = jwt.verify(token, secretKey);
+    // Clear any tokens, cookies, or sessions associated with the user (if applicable)
+    // Example: req.session.destroy();
 
-    // Blacklist the token (optional step)
-    // You can implement a token blacklist to prevent the token from being used again
+    await user.save(); // Save the updated user in the database
 
-    // Perform any other necessary cleanup or logging
+    console.log('Logout successful');
 
-    // Return a success message
-    return res.status(200).json({ message: 'Logout successful' });
+    // Respond with a success message
+    res.status(200).json({ message: 'Logout successful' });
   } catch (error) {
     console.error('Error occurred during logout:', error);
+
+    if (error.name === 'ValidationError') {
+      // Handle validation errors (if any)
+      return res.status(400).json({ error: error.message });
+    }
+
     res.status(500).json({ error: 'An error occurred during logout' });
   }
 });
+
 module.exports = router;

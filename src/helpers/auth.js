@@ -10,7 +10,7 @@ const createAccessToken = (user) => {
     isAdmin: user.isAdmin,
   };
 
-  const token = jwt.sign(data, secretKey, { expiresIn: '15m' }); // Set the expiration time to 15 minutes
+  const token = jwt.sign(data, secretKey, { expiresIn: '1h' }); // Set the expiration time to 15 minutes
   return token;
 };
 

@@ -2,26 +2,26 @@ const NoteModel = require("../models/note");
 const UserModel = require("../models/User"); // Import the User model
 
 const notesController = {
-  createNote: async (content, status, applicantId, userId) => {
+  createNoteForApplicant: async (applicantId, content, status, userId) => {
+    console.log("Creating note with userId:", userId);
+    console.log("applicantId:", applicantId);
+    console.log("content:", content);
+    console.log("status:", status);
+  
     try {
-      // Create a new note instance
-      const newNote = new NoteModel({ content, status, applicantId, userId});
-
-      // Save the new note to the database
+      const newNote = new NoteModel({ content, status, applicantId, userId });
       await newNote.save();
-
       return newNote;
     } catch (error) {
       console.error("Error creating note:", error);
       throw error;
     }
   },
+  
 
-  getAllNotesForUser: async (applicantId, userId) => {
+  getAllNotes: async () => {
     try {
-      // Find all notes for the specified user
-      const notes = await NoteModel.find({ applicantId, userId }); // Use userId instead of findById
-    
+      const notes = await NoteModel.find().populate("userId", "firstName lastName");
       return notes;
     } catch (error) {
       console.error("Error retrieving notes:", error);
@@ -29,14 +29,8 @@ const notesController = {
     }
   },
   
-  
-  
-  
-  updateNoteById: async (req, res) => {
+  updateNoteById: async (noteId, content, status) => {
     try {
-      const noteId = req.params.noteId;
-      const { content, status } = req.body;
-
       // Find and update the note by ID
       const updatedNote = await NoteModel.findByIdAndUpdate(
         noteId,
@@ -45,59 +39,45 @@ const notesController = {
       );
 
       if (!updatedNote) {
-        return res.status(404).json({ error: "Note not found" });
+        return null; // Note not found
       }
 
-      return res
-        .status(200)
-        .json({ message: "Note updated successfully", note: updatedNote });
+      return updatedNote;
     } catch (error) {
       console.error("Error updating note:", error);
-      return res
-        .status(500)
-        .json({ error: "An error occurred while updating the note" });
+      throw error;
     }
   },
 
-  deleteNoteById: async (req, res) => {
+  deleteNoteById: async (noteId) => {
     try {
-      const noteId = req.params.noteId;
-
       // Find and remove the note by ID
       const deletedNote = await NoteModel.findByIdAndRemove(noteId);
 
       if (!deletedNote) {
-        return res.status(404).json({ error: "Note not found" });
+        return null; // Note not found
       }
 
-      return res
-        .status(200)
-        .json({ message: "Note deleted successfully", note: deletedNote });
+      return deletedNote;
     } catch (error) {
       console.error("Error deleting note:", error);
-      return res
-        .status(500)
-        .json({ error: "An error occurred while deleting the note" });
+      throw error;
     }
   },
 
-  getNoteById: async (req, res) => {
+  getNoteById: async (noteId) => {
     try {
-      const noteId = req.params.noteId;
-
       // Find the note by its ID
       const note = await NoteModel.findById(noteId);
 
       if (!note) {
-        return res.status(404).json({ error: "Note not found" });
+        return null; // Note not found
       }
 
-      return res.status(200).json(note);
+      return note;
     } catch (error) {
       console.error("Error retrieving note by ID:", error);
-      return res
-        .status(500)
-        .json({ error: "An error occurred while retrieving the note" });
+      throw error;
     }
   },
 

@@ -6,6 +6,7 @@ const cors = require("cors");
 const helmet = require("helmet"); // Import Helmet
 const authRoutes = require("./routes/authRoutes");
 const users = require("./routes/users");
+const cookieParser = require('cookie-parser');
 const inventoryRoutes = require("./routes/inventoryRoutes");
 const emailRoutes = require("./routes/emailRoutes"); // Import the email routes
 const applicantRoutes = require("./routes/applicantRoutes"); // Import the applicant routes
@@ -14,6 +15,7 @@ const signatureRoutes = require("./routes/signatureRoute"); // Import the Signat
 const countRoutes = require('./routes/countRoutes'); // Import the countRoutes Routes
 const notesRoutes = require('./routes/notesRoutes'); // Make sure the path is correct
 const registration = require('./routes/registration');
+const apiKeyRoute = require('./routes/apiKeyRoute');
 
 const path = require("path");
 
@@ -44,14 +46,17 @@ app.use(bodyParser.json());
 app.use(cors());
 app.options("*", cors());
 app.use(express.json());
+app.use(cookieParser());
 
 // Serve static files from the 'uploads' directory
 //app.use('/uploads', express.static('uploads'));
 // Assuming 'express' is imported and your app is defined as 'app'
 
 // Routes
+app.use(apiKeyRoute); 
 app.use("/api/users", users);
 app.use("/api/login", authRoutes);
+app.use("/api/logout", authRoutes);
 app.use("/api/register", registration);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/emails", emailRoutes); // Add the email routes

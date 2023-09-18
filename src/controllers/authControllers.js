@@ -35,7 +35,21 @@ const login = async (req, res) => {
   }
 };
 
-// Function to get user profile by user ID
+const logout = async (req, res) => {
+  try {
+    // Clear the user's token field in the database (assuming user is authenticated)
+    req.user.token = null; // You should have the authenticated user in the request object
+
+    // Save the updated user in the database
+    await req.user.save();
+
+    console.log('User logged out successfully');
+    res.json({ message: 'Logout successful' });
+  } catch (error) {
+    console.error('Error occurred during logout:', error);
+    res.status(500).json({ error: 'An error occurred during logout' });
+  }
+};
 
 const getUserById = async (req, res) => {
   const { userId } = req.params;
@@ -54,6 +68,7 @@ const getUserById = async (req, res) => {
     res.status(500).json({ error: 'An error occurred while retrieving user' });
   }
 };
+
 
 const getUser = async (req, res) => {
   const { userId } = req.params;
