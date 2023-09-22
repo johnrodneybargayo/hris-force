@@ -16,7 +16,7 @@
     "google-auth-library": "^9.0.0",
     "googleapis": "^126.0.1",
     "helmet": "^7.0.0",
-    "joi": "^17.10.0",
+    "joi": "^17.10.1",
     "jsonwebtoken": "^9.0.2",
     "mongodb-client-encryption": "^6.0.0",
     "mongodb-connection-string-url": "^2.6.0",
